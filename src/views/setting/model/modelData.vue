@@ -217,6 +217,8 @@ import axios from "@/utils/axios";
 import modeListDialog from "./modeListDialog.vue";
 import addModelDialog from "./addModelDialog.vue";
 
+const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+
 const modelDataShow = defineModel("modelDataShow", {
   type: Boolean,
   required: true,
@@ -248,6 +250,12 @@ interface RowData {
   createTime: number;
   apiKey: string;
   load?: boolean;
+}
+
+function normalizeManufacturer(manufacturer: string): string {
+  const input = (manufacturer || "").trim();
+  if (input.toLowerCase() === "openrouter") return "openrouter";
+  return input;
 }
 
 const tableRef = ref();
@@ -397,6 +405,7 @@ const websites = ref<Record<string, string>>({
   zhipu: "https://bigmodel.cn/usercenter/proj-mgmt/apikeys",
   qwen: "https://bailian.console.aliyun.com/cn-beijing/?tab=model#/api-key",
   wan: "https://bailian.console.aliyun.com/cn-beijing/?tab=model#/api-key",
+  openrouter: "https://openrouter.ai/settings/keys",
   openai: "",
   vidu: "https://platform.vidu.cn/api-keys",
   anthropic: "",
@@ -416,6 +425,7 @@ const manufacturerNames: Record<string, string> = {
   zhipu: "智谱",
   qwen: "阿里千问",
   wan: "阿里万相",
+  openrouter: "OpenRouter",
   openai: "OpenAI",
   vidu: "Vidu",
   anthropic: "Anthropic",
@@ -446,6 +456,9 @@ const manufacturerDefaultBaseUrls: Record<string, Record<string, string>> = {
   },
   wan: {
     image: "https://dashscope.aliyuncs.com/api/v1/services/aigc/",
+  },
+  openrouter: {
+    text: OPENROUTER_BASE_URL,
   },
   openai: {
     text: "https://api.openai.com/v1",
@@ -479,6 +492,8 @@ const defaultPlaceHolder = computed((): string => {
 
 async function testAi(row: RowData) {
   const { model, apiKey, baseUrl, manufacturer } = row;
+  const normalizedManufacturer = normalizeManufacturer(manufacturer);
+  const normalizedBaseUrl = normalizedManufacturer === "openrouter" ? OPENROUTER_BASE_URL : baseUrl;
 
   if (!model) {
     MessagePlugin.warning("请先填写模型名称");
@@ -510,8 +525,8 @@ async function testAi(row: RowData) {
     const res = await axios.post(queryUrl, {
       modelName: model,
       apiKey: apiKey,
-      baseURL: baseUrl || undefined,
-      manufacturer,
+      baseURL: normalizedBaseUrl || undefined,
+      manufacturer: normalizedManufacturer,
     });
 
     if (row.type == "text") {

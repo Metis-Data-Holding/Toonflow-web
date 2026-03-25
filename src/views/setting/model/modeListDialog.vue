@@ -137,6 +137,7 @@ const websites = ref<Record<string, string>>({
   zhipu: "https://bigmodel.cn/usercenter/proj-mgmt/apikeys",
   qwen: "https://bailian.console.aliyun.com/cn-beijing/?tab=model#/api-key",
   wan: "https://bailian.console.aliyun.com/cn-beijing/?tab=model#/api-key",
+  openrouter: "https://openrouter.ai/settings/keys",
   openai: "",
   vidu: "https://platform.vidu.cn/api-keys",
   anthropic: "",
@@ -157,6 +158,7 @@ const manufacturerNames: Record<string, string> = {
   zhipu: "智谱",
   qwen: "阿里千问",
   wan: "阿里万相",
+  openrouter: "OpenRouter",
   openai: "OpenAI",
   vidu: "Vidu",
   anthropic: "Anthropic",
@@ -177,6 +179,7 @@ function getManufacturerColor(manufacturer: string): string {
     zhipu: "cyan",
     qwen: "green",
     wan: "green",
+    openrouter: "gold",
     openai: "geekblue",
     vidu: "magenta",
     anthropic: "volcano",
@@ -223,6 +226,11 @@ const manufacturerDefaultBaseUrls: Record<string, Record<string, string>> = {
     image: "",
     video:
       "https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis|https://dashscope.aliyuncs.com/api/v1/services/aigc/image2video/video-synthesis|https://dashscope.aliyuncs.com/api/v1/tasks/{taskId}",
+  },
+  openrouter: {
+    text: "https://openrouter.ai/api/v1",
+    image: "",
+    video: "",
   },
   openai: {
     text: "https://api.openai.com/v1",
@@ -485,6 +493,10 @@ function selectModel(model: ModelCard) {
 
 // 选择自定义模型
 function selectCustomModel(type: string) {
+  const chosenManufacturer = selectedManufacturers.value.length === 1 ? selectedManufacturers.value[0] : "other";
+  const normalizedManufacturer = chosenManufacturer.toLowerCase() === "openrouter" ? "openrouter" : chosenManufacturer;
+  const defaultBaseUrl = manufacturerDefaultBaseUrls[normalizedManufacturer]?.[type] || "";
+
   isCustomModel.value = true;
   modelForm.value = {
     id: 0,
@@ -492,8 +504,8 @@ function selectCustomModel(type: string) {
     type: type,
     modelType: "",
     model: "",
-    baseUrl: "",
-    manufacturer: "other",
+    baseUrl: defaultBaseUrl,
+    manufacturer: normalizedManufacturer,
     createTime: 0,
     apiKey: "",
   };
