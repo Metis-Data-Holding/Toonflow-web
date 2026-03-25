@@ -1,4 +1,5 @@
 import settingStore from "@/stores/setting";
+import { getRuntimeEndpointDefaults, normalizeWsBaseUrl } from "@/utils/runtimeEndpoints";
 
 // utils/WsClient.ts
 type WsOptions = {
@@ -7,8 +8,8 @@ type WsOptions = {
   maxRetries?: number; // 最大重连次数
   onMessage?: (msg: string) => void;
   onOpen?: () => void;
-  onClose?: (e: any) => void;
-  onError?: (err: any) => void;
+  onClose?: (e: CloseEvent) => void;
+  onError?: (err: Error) => void;
 };
 
 class WsClient {
@@ -20,8 +21,8 @@ class WsClient {
 
   constructor(url: string, options: WsOptions = {}) {
     const { wsBaseUrl } = storeToRefs(settingStore());
-
-    const fullUrl = new URL(url, wsBaseUrl.value);
+    const { wsBaseUrl: fallbackWsBaseUrl } = getRuntimeEndpointDefaults();
+    const fullUrl = new URL(url, normalizeWsBaseUrl(wsBaseUrl.value) || fallbackWsBaseUrl);
     const token = localStorage.getItem("token");
     if (token) fullUrl.searchParams.set("token", token);
     this.url = fullUrl.toString();
@@ -38,7 +39,11 @@ class WsClient {
     this.ws.onmessage = (e) => {
       if (this.options.onMessage) this.options.onMessage(e.data);
     };
-    this.ws.onerror = () => {
+    this.ws.onerror = (e) => {
+      if (this.options.onError) {
+        const error = e instanceof ErrorEvent ? e.error || new Error(e.message || "WebSocket 连接异常") : new Error("WebSocket 连接异常");
+        this.options.onError(error);
+      }
       this.stopTimeout();
       this.reconnect();
     };

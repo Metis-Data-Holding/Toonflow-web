@@ -7,10 +7,10 @@
       <a-modal v-model:open="showSettingModal" title="服务器设置" @ok="handleSaveSetting" :width="400">
         <a-form :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
           <a-form-item label="请求地址">
-            <a-input v-model:value="tempBaseUrl" placeholder="http://localhost:60000" />
+            <a-input v-model:value="tempBaseUrl" :placeholder="endpointDefaults.baseUrl" />
           </a-form-item>
           <a-form-item label="WS地址">
-            <a-input v-model:value="tempWsBaseUrl" placeholder="ws://localhost:60000" />
+            <a-input v-model:value="tempWsBaseUrl" :placeholder="endpointDefaults.wsBaseUrl" />
           </a-form-item>
         </a-form>
       </a-modal>
@@ -63,28 +63,38 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from "vue";
-import Router from "@/router/index.ts";
+<script setup lang="ts">
+import { ref, onMounted, watch } from "vue";
+import Router from "@/router/index";
 import { Alert, message } from "ant-design-vue";
 import logo from "@/assets/logo.png";
 import axios from "@/utils/axios";
 import settingStore from "@/stores/setting";
 import { storeToRefs } from "pinia";
+import { getRuntimeEndpointDefaults } from "@/utils/runtimeEndpoints";
 
 const store = settingStore();
 const { baseUrl, wsBaseUrl } = storeToRefs(store);
+const endpointDefaults = getRuntimeEndpointDefaults();
 
-const svgRef = ref(null);
+const svgRef = ref<HTMLElement | null>(null);
 const showHint = ref(true);
 const showSettingModal = ref(false);
 const tempBaseUrl = ref(baseUrl.value);
 const tempWsBaseUrl = ref(wsBaseUrl.value);
 
+watch(showSettingModal, (visible) => {
+  if (visible) {
+    tempBaseUrl.value = baseUrl.value;
+    tempWsBaseUrl.value = wsBaseUrl.value;
+  }
+});
+
 // 保存设置
 const handleSaveSetting = () => {
-  baseUrl.value = tempBaseUrl.value;
-  wsBaseUrl.value = tempWsBaseUrl.value;
+  store.setEndpoints(tempBaseUrl.value, tempWsBaseUrl.value);
+  tempBaseUrl.value = baseUrl.value;
+  tempWsBaseUrl.value = wsBaseUrl.value;
   showSettingModal.value = false;
   message.success("设置已保存");
 };
@@ -110,7 +120,7 @@ const captcha = ref();
 onMounted(() => {
   resSvg();
 });
-const handleFinish = (values) => {
+const handleFinish = (values: { username: string; password: string; captcha?: string; identity?: string }) => {
   state.value.loginLoading = true;
   const obj = { ...values };
   axios
@@ -129,12 +139,7 @@ const handleFinish = (values) => {
     });
 };
 
-const resSvg = async () => {
-  return;
-  const { data } = await axios.get("/other/getCaptcha");
-  svgRef.value.innerHTML = data.svg;
-  captcha.value = data.captcha;
-};
+const resSvg = async () => {};
 </script>
 
 <style lang="scss" scoped>

@@ -2,12 +2,14 @@ import axios from "axios";
 import router from "@/router/index";
 import { storeToRefs } from "pinia";
 import settingStore from "@/stores/setting";
+import { getRuntimeEndpointDefaults, normalizeApiBaseUrl } from "@/utils/runtimeEndpoints";
 
 const instance = axios.create();
 
 instance.interceptors.request.use(function (config) {
   const { baseUrl, otherSetting } = storeToRefs(settingStore());
-  config.baseURL = baseUrl.value;
+  const { baseUrl: fallbackBaseUrl } = getRuntimeEndpointDefaults();
+  config.baseURL = normalizeApiBaseUrl(baseUrl.value) || fallbackBaseUrl;
   config.timeout = otherSetting.value.axiosTimeOut;
   const token = localStorage.getItem("token");
   if (token) {
@@ -27,7 +29,7 @@ instance.interceptors.response.use(
       window.$message.error("登录已过期，请重新登录");
     }
     return Promise.reject(error?.response?.data ?? error);
-  }
+  },
 );
 
 export default instance;
