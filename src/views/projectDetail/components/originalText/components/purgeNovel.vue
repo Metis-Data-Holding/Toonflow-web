@@ -50,7 +50,7 @@
             <div>
               <t-table
                 ref="tableRef"
-                row-key="index"
+                row-key="key"
                 :data="tableData"
                 :columns="columns"
                 :selected-row-keys="selectedRowKeys"
@@ -85,6 +85,7 @@ import mammoth from "mammoth";
 import { MessagePlugin } from "tdesign-vue-next";
 
 interface ChapterItem {
+  key: string;
   index: number;
   reel: string;
   chapter: string;
@@ -98,8 +99,8 @@ const activeKey = ref("To1");
 const tableRef = ref();
 const uploadRef = ref();
 const content = ref("");
-const fileList = ref<any[]>([]);
-const selectedRowKeys = ref<number[]>([]);
+const fileList = ref<Array<Record<string, unknown>>>([]);
+const selectedRowKeys = ref<string[]>([]);
 
 const columns = [
   { colKey: "row-select", type: "multiple", width: 60 },
@@ -114,7 +115,8 @@ const tableData = computed<ChapterItem[]>(() => {
   if (!content.value) return [];
   try {
     return parseNovel(content.value).flatMap((reel) =>
-      reel.chapters.map((chapter) => ({
+      reel.chapters.map((chapter, chapterIdx) => ({
+        key: `${reel.index}::${reel.reel || "正文卷"}::${chapter.index}::${chapter.chapter || ""}::${chapterIdx}`,
         index: chapter.index,
         reel: reel.reel,
         chapter: chapter.chapter,
@@ -128,7 +130,10 @@ const tableData = computed<ChapterItem[]>(() => {
 });
 
 // 选中的行数据
-const selectedRows = computed(() => tableData.value.filter((item) => selectedRowKeys.value.includes(item.index)));
+const selectedRows = computed(() => {
+  const selectedSet = new Set(selectedRowKeys.value);
+  return tableData.value.filter((item) => selectedSet.has(item.key));
+});
 
 // 已选文本总长度
 const selectedTextLength = computed(() => selectedRows.value.reduce((sum, item) => sum + item.chapterData.length, 0));
@@ -186,8 +191,8 @@ async function handleBeforeUpload(file: { raw: File }) {
 }
 
 // 勾选变化
-function onSelectChange(selectedKeys: number[]) {
-  selectedRowKeys.value = selectedKeys;
+function onSelectChange(selectedKeys: Array<string | number>) {
+  selectedRowKeys.value = selectedKeys.map((key) => String(key));
 }
 
 // 提交
