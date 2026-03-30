@@ -1,9 +1,11 @@
 const REEL_REGEX = /^(第[\d一二三四五六七八九十百千]+卷)\s*([^\n第]*)/gm;
-const CHAPTER_REGEX = /(第[\d一二三四五六七八九十百千]+章)\s*([^\n\r]*)/g;
+const CHAPTER_REGEX = /^\s*(第([\d零〇一二三四五六七八九十百千万两]+)([章节回集]))[\s　:：\-—\.、）)]*([^\n\r]*)/gm;
 const CHINESE_NUM_MAP: { [key: string]: number } = {
   零: 0,
+  〇: 0,
   一: 1,
   二: 2,
+  两: 2,
   三: 3,
   四: 4,
   五: 5,
@@ -16,6 +18,7 @@ const CHINESE_UNIT_MAP: { [key: string]: number } = {
   十: 10,
   百: 100,
   千: 1000,
+  万: 10000,
 };
 interface Chapter {
   index: number;
@@ -28,23 +31,31 @@ interface Reel {
   chapters: Chapter[];
 }
 function parseNumber(numStr: string): number {
-  if (/^\d+$/.test(numStr)) return parseInt(numStr, 10);
-  if (/^十[一二三四五六七八九]?$/.test(numStr)) {
-    if (numStr.length === 1) return 10;
-    return 10 + CHINESE_NUM_MAP[numStr[1]];
-  }
-  let num = 0,
-    digit = 0;
-  for (const c of numStr) {
-    if (CHINESE_NUM_MAP[c] !== undefined) digit = CHINESE_NUM_MAP[c];
-    else if (CHINESE_UNIT_MAP[c] !== undefined) {
-      if (digit === 0 && c === "十") digit = 1;
-      num += digit * CHINESE_UNIT_MAP[c];
-      digit = 0;
+  const normalizedNum = numStr.replace(/两/g, "二").replace(/〇/g, "零").trim();
+  if (/^\d+$/.test(normalizedNum)) return parseInt(normalizedNum, 10);
+  if (!normalizedNum) return 0;
+  let result = 0;
+  let section = 0;
+  let digit = 0;
+  for (const c of normalizedNum) {
+    if (CHINESE_NUM_MAP[c] !== undefined) {
+      digit = CHINESE_NUM_MAP[c];
+      continue;
     }
+    const unit = CHINESE_UNIT_MAP[c];
+    if (!unit) continue;
+    if (unit === 10000) {
+      section = (section + digit) * unit;
+      result += section;
+      section = 0;
+      digit = 0;
+      continue;
+    }
+    if (digit === 0) digit = 1;
+    section += digit * unit;
+    digit = 0;
   }
-  num += digit;
-  return num;
+  return result + section + digit;
 }
 export default function parseNovel(text: string): Reel[] {
   REEL_REGEX.lastIndex = 0;
@@ -67,8 +78,8 @@ export default function parseNovel(text: string): Reel[] {
           .replace(/^[\r\n]+/, "")
           .trim();
         chapters.push({
-          index: parseNumber(matches[i][1].replace(/第|章/g, "")),
-          chapter: matches[i][2].trim(),
+          index: parseNumber(matches[i][2]),
+          chapter: matches[i][4].trim(),
           text: content,
         });
       }
@@ -110,8 +121,8 @@ export default function parseNovel(text: string): Reel[] {
         .replace(/^[\r\n]+/, "")
         .trim();
       chapters.push({
-        index: parseNumber(chapterMatches[j][1].replace(/第|章/g, "")),
-        chapter: chapterMatches[j][2].trim(),
+        index: parseNumber(chapterMatches[j][2]),
+        chapter: chapterMatches[j][4].trim(),
         text: content,
       });
     }
