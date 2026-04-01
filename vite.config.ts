@@ -5,7 +5,7 @@ import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import { AntDesignVueResolver, ElementPlusResolver, TDesignResolver } from "unplugin-vue-components/resolvers";
 import { lazyImport, VxeResolver } from "vite-plugin-lazy-import";
-import { viteSingleFile } from "vite-plugin-singlefile";
+// import { viteSingleFile } from "vite-plugin-singlefile";
 
 export default defineConfig({
   base: "./",
@@ -40,7 +40,7 @@ export default defineConfig({
         }),
       ],
     }),
-    viteSingleFile(),
+    // viteSingleFile(),
   ],
   resolve: {
     alias: {
