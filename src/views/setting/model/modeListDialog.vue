@@ -123,12 +123,9 @@ const tabList = [
 ];
 const useTabList = computed(() => {
   if (!props.typeList.length) {
-    activeTab.value = "text";
     return tabList;
   }
-  const resKey = tabList.filter((tab) => props.typeList.includes(tab.key));
-  activeTab.value = resKey.length > 0 ? resKey[0].key : "";
-  return resKey;
+  return tabList.filter((tab) => props.typeList.includes(tab.key));
 });
 const websites = ref<Record<string, string>>({
   deepSeek: "https://platform.deepseek.com",
@@ -229,7 +226,7 @@ const manufacturerDefaultBaseUrls: Record<string, Record<string, string>> = {
   },
   openrouter: {
     text: "https://openrouter.ai/api/v1",
-    image: "",
+    image: "https://openrouter.ai/api/v1",
     video: "",
   },
   openai: {
@@ -408,6 +405,20 @@ function clearFilters() {
 watch(activeTab, () => {
   clearFilters();
 });
+watch(
+  useTabList,
+  (tabs) => {
+    const nextActiveTab = tabs[0]?.key ?? "";
+    if (!tabs.length) {
+      activeTab.value = "";
+      return;
+    }
+    if (!tabs.some((tab) => tab.key === activeTab.value)) {
+      activeTab.value = nextActiveTab;
+    }
+  },
+  { immediate: true },
+);
 watch(
   () => modelShow.value,
   (newVal) => {

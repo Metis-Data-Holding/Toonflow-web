@@ -78,6 +78,8 @@ interface OpenRouterModelOption {
   value: string;
 }
 
+type OpenRouterModelApiType = "text" | "image";
+
 const props = defineProps({
   currentWebsite: {
     type: String,
@@ -93,7 +95,7 @@ const props = defineProps({
   },
   manufacturerNames: {
     type: Object,
-    default: {},
+    default: () => ({}),
   },
 });
 
@@ -131,10 +133,11 @@ const openRouterFetched = ref(false);
 
 const openRouterStatusText = computed(() => {
   if (!isOpenRouter.value) return "";
+  const modelTypeText = modelForm.value.type === "image" ? "图像模型" : "文本模型";
   if (openRouterLoading.value) return "正在拉取模型列表...";
-  if (!modelForm.value.apiKey?.trim()) return "请输入 API Key 后自动拉取";
-  if (openRouterModelOptions.value.length) return `已拉取 ${openRouterModelOptions.value.length} 个模型`;
-  if (openRouterFetched.value) return "未获取到模型，可手动输入模型 ID";
+  if (!modelForm.value.apiKey?.trim()) return `请输入 API Key 后自动拉取 ${modelTypeText}`;
+  if (openRouterModelOptions.value.length) return `已拉取 ${openRouterModelOptions.value.length} 个${modelTypeText}`;
+  if (openRouterFetched.value) return `未获取到${modelTypeText}，可手动输入模型 ID`;
   return "等待拉取模型列表";
 });
 
@@ -151,6 +154,14 @@ watch(
   { immediate: true },
 );
 
+function getOpenRouterApiType(): OpenRouterModelApiType {
+  return modelForm.value.type === "image" ? "image" : "text";
+}
+
+function getOpenRouterModelsEndpoint() {
+  return getOpenRouterApiType() === "image" ? "/setting/getOpenRouterImageModels" : "/setting/getOpenRouterModels";
+}
+
 async function refreshOpenRouterModels(showToast = false) {
   if (!isOpenRouter.value) return;
   const apiKey = modelForm.value.apiKey?.trim();
@@ -161,19 +172,24 @@ async function refreshOpenRouterModels(showToast = false) {
 
   openRouterLoading.value = true;
   try {
-    const res = await axios.post("/setting/getOpenRouterModels", {
+    const res = await axios.post(getOpenRouterModelsEndpoint(), {
       apiKey,
       baseURL: OPENROUTER_BASE_URL,
     });
     const list = Array.isArray(res?.data?.openrouter) ? res.data.openrouter : [];
     openRouterModelOptions.value = list;
     openRouterFetched.value = true;
-    if (showToast) MessagePlugin.success(`已拉取 ${list.length} 个模型`);
-  } catch (e: any) {
+    if (showToast) {
+      const modelTypeText = getOpenRouterApiType() === "image" ? "图像模型" : "文本模型";
+      MessagePlugin.success(`已拉取 ${list.length} 个${modelTypeText}`);
+    }
+  } catch (e: unknown) {
     openRouterModelOptions.value = [];
     openRouterFetched.value = true;
     if (showToast) {
-      MessagePlugin.error(e?.message || "拉取 OpenRouter 模型失败");
+      const modelTypeText = getOpenRouterApiType() === "image" ? "图像模型" : "文本模型";
+      const message = e instanceof Error ? e.message : `拉取 OpenRouter ${modelTypeText}失败`;
+      MessagePlugin.error(message);
     }
   } finally {
     openRouterLoading.value = false;

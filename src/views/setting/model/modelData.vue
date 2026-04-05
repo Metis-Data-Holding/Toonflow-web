@@ -365,7 +365,7 @@ function handleRadioChange(row: RowData) {
 }
 
 // 处理行点击
-function handleRowClick({ row }: { row: any }) {
+function handleRowClick({ row }: { row: RowData }) {
   if (row.type === props.currentType) {
     selectedRowId.value = row.id;
   }
@@ -459,6 +459,7 @@ const manufacturerDefaultBaseUrls: Record<string, Record<string, string>> = {
   },
   openrouter: {
     text: OPENROUTER_BASE_URL,
+    image: OPENROUTER_BASE_URL,
   },
   openai: {
     text: "https://api.openai.com/v1",
@@ -546,8 +547,9 @@ async function testAi(row: RowData) {
         testVideoVisible.value = true;
       }
     }
-  } catch (e: any) {
-    MessagePlugin.error(`连接失败: ${e.message}`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "未知错误";
+    MessagePlugin.error(`连接失败: ${message}`);
   } finally {
     row.load = false;
   }
