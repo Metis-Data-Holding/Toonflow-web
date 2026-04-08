@@ -3,7 +3,6 @@
     <el-config-provider>
       <a-config-provider :theme="theme" :locale="zhCN">
         <router-view></router-view>
-        <UpdateDialog />
       </a-config-provider>
     </el-config-provider>
   </t-config-provider>
@@ -14,7 +13,6 @@ import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { theme as antTheme } from "ant-design-vue";
 import zhCN from "ant-design-vue/es/locale/zh_CN";
-import UpdateDialog from "@/components/update.vue";
 import { initTheme } from "@/utils/theme";
 import settingStore from "@/stores/setting";
 
