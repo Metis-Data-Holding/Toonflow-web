@@ -1,16 +1,16 @@
 <template>
-  <div class="root">
-    <div class="header">
-      <div>
-        <h2 class="title">我的项目</h2>
-        <p class="sub">管理您的所有短剧项目</p>
+  <div class="root tf-page">
+    <div class="header tf-page-header">
+      <div class="tf-page-heading">
+        <h2 class="title tf-page-title">我的项目</h2>
+        <p class="sub tf-page-description">管理您的所有短剧项目</p>
       </div>
-      <button class="addBtn" @click="routeToCreateProject">
+      <button class="addBtn tf-button-primary" @click="routeToCreateProject">
         <i-plus class="addIcon" :size="20" />
         新建项目
       </button>
     </div>
-    <div v-if="projects.length === 0" class="empty">
+    <div v-if="projects.length === 0" class="empty tf-panel">
       <div class="emptyIcon">
         <i-folder-open class="iconEmpty" :size="48" />
       </div>
@@ -19,7 +19,7 @@
     </div>
 
     <div v-else class="list">
-      <div v-for="project in projects" :key="project.id" class="card" @click="openProject(project.id)">
+      <div v-for="project in projects" :key="project.id" class="card tf-card" @click="openProject(project.id)">
         <div class="content">
           <div class="cardHeader">
             <div class="left">
@@ -69,6 +69,7 @@ const projects = ref<
     type: string;
     artStyle: string | null;
     videoRatio: string | null;
+    projectType: string | null;
     createTime: number;
     updatedAt: number;
   }[]
@@ -115,36 +116,13 @@ function deleteProject(projectId: string | undefined) {
 
 <style lang="scss" scoped>
 .root {
-  max-width: 112rem;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
   background: transparent;
 
   .header {
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    .title {
-      font-size: 2rem;
-      font-weight: 600;
-      color: var(--td-text-color-primary);
-      margin-bottom: 0.5rem;
-    }
-    .sub {
-      color: var(--td-text-color-secondary);
-    }
     .addBtn {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      background: var(--td-bg-color-container);
-      border: 1px solid var(--td-border-level-1-color);
-      border-radius: 0.5rem;
-      color: var(--td-brand-color);
-      font-weight: 500;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
 
       .addIcon {
         margin-right: 0.25rem;
@@ -154,12 +132,13 @@ function deleteProject(projectId: string | undefined) {
 
   .empty {
     text-align: center;
-    padding: 4rem 0;
+    padding: 72px 24px;
 
     .emptyIcon {
       width: 6rem;
       height: 6rem;
-      background: var(--td-bg-color-secondarycontainer);
+      background: var(--tf-bg-panel-2);
+      border: 1px solid var(--tf-border-subtle);
       border-radius: 9999px;
       display: flex;
       align-items: center;
@@ -182,11 +161,9 @@ function deleteProject(projectId: string | undefined) {
   }
 
   .list {
-    max-height: 80vh;
-    overflow-y: auto;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 20px;
     @media (min-width: 768px) {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -195,15 +172,9 @@ function deleteProject(projectId: string | undefined) {
     }
 
     .card {
-      background: var(--td-bg-color-container);
-      border-radius: 1rem;
-      border: 1px solid var(--td-border-level-1-color);
-      transition: box-shadow 0.3s;
       height: 100%;
       cursor: pointer;
-      &:hover {
-        box-shadow: var(--td-shadow-2);
-      }
+
       .content {
         padding: 1.5rem;
 
@@ -221,50 +192,54 @@ function deleteProject(projectId: string | undefined) {
             .folderIcon {
               width: 3rem;
               height: 3rem;
-              background: linear-gradient(135deg, var(--td-brand-color) 0%, var(--td-brand-color-5) 100%);
-              border-radius: 0.75rem;
+              background: var(--tf-accent-soft);
+              border: 1px solid rgba(124, 132, 255, 0.2);
+              border-radius: 12px;
               display: flex;
               align-items: center;
               justify-content: center;
+
               .iconFolder {
-                color: var(--td-text-color-anti);
+                color: var(--tf-accent-hover);
               }
             }
 
             .name {
               font-weight: 600;
-              color: var(--td-text-color-primary);
+              color: var(--tf-text-primary);
+              margin: 0 0 4px;
             }
-            .status {
+
+            .type {
               display: flex;
               align-items: center;
               gap: 0.5rem;
-              margin-top: 0.25rem;
+
               .desc {
-                font-size: 0.75rem;
-                color: var(--td-text-color-secondary);
+                font-size: 13px;
+                color: var(--tf-text-secondary);
               }
-            }
-          }
-          @keyframes spin {
-            to {
-              transform: rotate(360deg);
             }
           }
 
           .menu {
             position: relative;
+
             .delBtn {
               padding: 0.5rem;
-              color: var(--td-error-color);
-              border-radius: 0.5rem;
+              color: var(--tf-text-muted);
+              border-radius: 10px;
               background: none;
-              border: none;
+              border: 1px solid transparent;
               transition:
                 color 0.2s,
-                background 0.2s;
+                background 0.2s,
+                border-color 0.2s;
+
               &:hover {
-                background: var(--td-error-color-light);
+                color: var(--tf-danger);
+                border-color: rgba(239, 68, 68, 0.18);
+                background: rgba(239, 68, 68, 0.08);
                 cursor: pointer;
               }
             }
@@ -272,9 +247,10 @@ function deleteProject(projectId: string | undefined) {
         }
 
         .summary {
-          color: var(--td-text-color-secondary);
+          color: var(--tf-text-secondary);
           margin-bottom: 1rem;
-          font-size: 0.9375rem;
+          font-size: 14px;
+          line-height: 1.65;
           line-clamp: 2;
           overflow: hidden;
           display: -webkit-box;
@@ -291,12 +267,12 @@ function deleteProject(projectId: string | undefined) {
         .time {
           margin-top: 1rem;
           padding-top: 1rem;
-          border-top: 1px solid var(--td-border-level-1-color);
+          border-top: 1px solid var(--tf-border-subtle);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          color: var(--td-text-color-secondary);
-          font-size: 0.8125rem;
+          color: var(--tf-text-muted);
+          font-size: 13px;
         }
       }
     }

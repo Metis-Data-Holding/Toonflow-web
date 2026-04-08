@@ -1,7 +1,7 @@
 <template>
   <a-modal
     v-model:open="showModal"
-    wrapClassName="noHeaderMargin"
+    wrapClassName="noHeaderMargin asset-element-modal"
     :footer="false"
     :width="640"
     dialogClass="customModal"
@@ -9,20 +9,20 @@
     :close-btn="false"
     :maskClosable="false">
     <template #header>
-      <div class="ac jb titHeader" style="background: #f9faff; height: 60px; display: flex; width: 100%" v-if="formData">
-        <div>
-          <span style="font-weight: bold; font-size: 18px; margin-left: 24px">{{ formData.id ? "编辑" : "新建" }}{{ typeRecord[props.type] }}</span>
-          <div style="margin-left: 24px">
-            <span style="font-size: 14px">{{ formData.id ? "编辑" : "新建" }}元素信息和素材</span>
+      <div class="ac jb titHeader" v-if="formData">
+        <div class="headerCopy">
+          <span class="headerTitle">{{ formData.id ? "编辑" : "新建" }}{{ typeRecord[props.type] }}</span>
+          <div class="headerSub">
+            <span>{{ formData.id ? "编辑" : "新建" }}元素信息和素材</span>
           </div>
         </div>
         <div class="closePoint" @click="editElementClose">
-          <i-close theme="outline" size="18" fill="#9913FA" />
+          <i-close theme="outline" size="18" fill="currentColor" />
         </div>
       </div>
     </template>
-    <div class="modelBody" style="max-height: 650px; overflow: auto" v-if="formData">
-      <a-form ref="formRef" :model="formData" layout="vertical" style="margin-top: 14px">
+    <div class="modelBody" v-if="formData">
+      <a-form ref="formRef" :model="formData" layout="vertical" class="elementForm">
         <!-- 名称 -->
         <a-form-item name="name" label="名称" required>
           <a-input v-model:value="formData.name" placeholder="例如：古代宫殿大殿" />
@@ -43,8 +43,8 @@
         </a-form-item>
       </a-form>
       <div class="footerBtns">
-        <a-button @click="editElementClose" shape="round">取消</a-button>
-        <a-button type="primary" shape="round" @click="handleSave" style="margin-left: 15px">保存</a-button>
+        <a-button @click="editElementClose">取消</a-button>
+        <a-button type="primary" @click="handleSave">保存</a-button>
       </div>
     </div>
   </a-modal>
@@ -139,38 +139,44 @@ function handleSave() {
 <style lang="scss" scoped>
 .modelBody {
   padding: 0 24px;
+  max-height: 650px;
+  overflow: auto;
+
+  .elementForm {
+    margin-top: 14px;
+  }
   .typeSelectBox {
     display: flex;
     gap: 16px;
     .typeCard {
       flex: 1;
       text-align: center;
-      background: #fff;
-      border: 2px solid #dfdfee;
+      background: var(--tf-bg-panel);
+      border: 1px solid var(--tf-border-subtle);
       border-radius: 14px;
       cursor: pointer;
       padding: 14px 0 10px 0;
       transition: all 0.18s;
       user-select: none;
       .active {
-        border-color: #a874e8;
-        background: #f7f1fe;
+        border-color: rgba(124, 132, 255, 0.28);
+        background: var(--tf-accent-soft);
       }
       .tabSub {
-        color: #795eb3;
+        color: var(--tf-text-secondary);
         font-size: 13px;
         margin-top: 4px;
       }
       .tabMain {
         font-weight: 600;
         font-size: 17px;
-        color: #8d37c9;
+        color: var(--tf-text-primary);
       }
       &:not(.active) .tabMain {
-        color: #222;
+        color: var(--tf-text-primary);
       }
       &:not(.active) .tabSub {
-        color: #444;
+        color: var(--tf-text-secondary);
       }
     }
   }
@@ -181,9 +187,9 @@ function handleSave() {
     .picturePreview {
       width: 132px;
       height: 132px;
-      border: 1.5px dashed #dbdde7;
+      border: 1.5px dashed var(--tf-border-strong);
       border-radius: 14px;
-      background: #f6f7fa;
+      background: var(--tf-bg-panel-2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -201,13 +207,13 @@ function handleSave() {
       align-items: flex-start;
       margin-left: 12px;
       .ant-btn {
-        background: #f7f8fa;
-        border: 1px solid #dbdde7;
-        border-radius: 8px;
-        color: #333;
+        background: var(--tf-bg-panel-2);
+        border: 1px solid var(--tf-border-subtle);
+        border-radius: 12px;
+        color: var(--tf-text-primary);
       }
       .tipTxt {
-        color: #669;
+        color: var(--tf-text-secondary);
         font-size: 13px;
         margin-top: 6px;
       }
@@ -218,12 +224,49 @@ function handleSave() {
     margin-bottom: 25px;
     display: flex;
     justify-content: flex-end;
+    gap: 12px;
   }
 }
 .titHeader {
+  background: var(--tf-bg-panel);
+  border-bottom: 1px solid var(--tf-border-subtle);
+  height: 60px;
+  display: flex;
+  width: 100%;
+
+  .headerCopy {
+    margin-left: 24px;
+  }
+
+  .headerTitle {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--tf-text-primary);
+  }
+
+  .headerSub {
+    margin-top: 2px;
+    font-size: 14px;
+    color: var(--tf-text-secondary);
+  }
+
   .closePoint {
     cursor: pointer;
     margin-right: 24px;
+    color: var(--tf-text-secondary);
   }
+}
+</style>
+
+<style>
+.asset-element-modal .ant-modal-content {
+  background: var(--tf-bg-panel);
+  border: 1px solid var(--tf-border-subtle);
+  box-shadow: var(--tf-shadow-2);
+}
+
+.asset-element-modal .ant-modal-header,
+.asset-element-modal .ant-modal-body {
+  background: var(--tf-bg-panel);
 }
 </style>

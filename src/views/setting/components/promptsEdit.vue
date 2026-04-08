@@ -6,8 +6,7 @@
         <t-menu-group :title="getTypeName(group.type)">
           <t-menu-item v-for="item in group.items" :key="item.code" :value="item.code">
             <div class="menuItemContent">
-              <span class="promptName">{{ item.name }}</span>
-              <span class="promptCode">{{ item.code }}</span>
+              <span class="promptName">{{ getPromptDisplayName(item) }}</span>
             </div>
           </t-menu-item>
         </t-menu-group>
@@ -57,7 +56,7 @@
           </template>
           <div class="editorBody">
             <t-textarea v-model="editingValue" placeholder="请输入提示词内容" class="promptTextarea" />
-     <span>*{{ hasCustomValue ? '当前使用自定义提示词，点击"一键重置"可恢复默认值' : "当前使用默认提示词，编辑后将保存为自定义值" }}</span>
+            <span>*{{ hasCustomValue ? '当前使用自定义提示词，点击"一键重置"可恢复默认值' : "当前使用默认提示词，编辑后将保存为自定义值" }}</span>
           </div>
         </t-card>
       </template>
@@ -121,6 +120,7 @@ const getTypeName = (type: string) => typeConfig[type]?.name || type;
 const getTypeTheme = (type: string): "default" | "success" | "primary" | "warning" | "danger" =>
   (typeConfig[type]?.theme as "default" | "success" | "primary" | "warning" | "danger") || "default";
 const processLineBreaks = (value: string) => value?.replace(/\\n/g, "\n") || "";
+const getPromptDisplayName = (prompt: Prompt) => prompt.name?.trim() || prompt.code;
 
 function onMenuChange(value: string | number) {
   const prompt = promptList.value.find((p) => p.code === value);
@@ -204,18 +204,16 @@ onMounted(fetchPrompts);
 
   .menuItemContent {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
+    min-width: 0;
 
     .promptName {
       font-size: 13px;
       font-weight: 500;
-    }
-
-    .promptCode {
-      font-size: 11px;
-      opacity: 0.6;
-      font-family: monospace;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 

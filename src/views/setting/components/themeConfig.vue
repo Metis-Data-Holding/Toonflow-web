@@ -1,5 +1,8 @@
 <template>
   <div class="themeConfig">
+    <div class="intro">
+      <p>工作台默认基于深色创作环境构建。切换模式或主色后会即时预览，建议优先使用默认蓝紫。</p>
+    </div>
     <t-form label-align="top">
       <!-- 主题模式切换 -->
       <t-form-item label="主题模式（切换后建议重启）">
@@ -47,7 +50,7 @@
             :show-primary-color-preview="false"
             @change="(val: string) => handleColorChange(val)">
             <template #trigger>
-              <div class="colorItem customColor" :style="{ backgroundColor: isCustomColor ? themeSetting.primaryColor : '#fff' }">
+              <div class="colorItem customColor" :style="{ backgroundColor: isCustomColor ? themeSetting.primaryColor : 'var(--tf-surface-raised)' }">
                 <t-icon :name="isCustomColor ? 'check' : 'edit'" :class="['customIcon', { checkIcon: isCustomColor }]" />
               </div>
             </template>
@@ -59,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed, watch } from "vue";
 import { useTheme, themeSetting } from "@/utils/theme";
 
 const { applyThemeMode, applyThemeColor, toggleThemeWithTransition } = useTheme();
@@ -100,29 +103,45 @@ watch(
 .themeConfig {
   width: 100%;
 
+  .intro {
+    margin-bottom: 16px;
+
+    p {
+      margin: 0;
+      color: var(--tf-text-secondary);
+      font: var(--tf-font-caption);
+    }
+  }
+
   .colorList {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
 
     .colorItem {
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
+      transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
       border: 2px solid transparent;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 
       &:hover {
-        transform: scale(1.1);
+        transform: translateY(-1px);
       }
 
       &.active {
-        border-color: var(--td-brand-color);
-        box-shadow: 0 0 0 2px rgba(0, 82, 217, 0.2);
+        border-color: var(--tf-accent);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+          0 0 0 3px rgba(124, 132, 255, 0.18);
       }
 
       .checkIcon {
@@ -131,14 +150,14 @@ watch(
       }
 
       &.customColor {
-        border: 2px dashed var(--td-border-level-2-color);
+        border: 1px dashed var(--tf-border-strong);
 
         .customIcon {
-          color: var(--td-text-color-secondary);
+          color: var(--tf-text-secondary);
         }
 
         &:hover {
-          border-color: var(--td-brand-color);
+          border-color: var(--tf-accent);
         }
       }
     }

@@ -204,7 +204,9 @@ function setLoadingByIds(ids: string[], key: "superScoreLoading" | "videoPromptL
   refreshTable();
 }
 
-function updateRowsByIds(responseData: any[], statusKey: "isSuperScored" | "isVideoPromptGenerated") {
+type UpdatedImageRow = Partial<ImageDataItem> & { id: string };
+
+function updateRowsByIds(responseData: UpdatedImageRow[], statusKey: "isSuperScored" | "isVideoPromptGenerated") {
   if (!responseData || !imageData.value) return;
 
   responseData.forEach((updated) => {
@@ -387,13 +389,21 @@ function handleOk() {
 <style lang="scss" scoped>
 .detection-image {
   :deep(.detection-modal) {
+    .t-dialog {
+      border: 1px solid var(--tf-border-subtle);
+      box-shadow: var(--tf-shadow-2);
+      background: var(--tf-bg-panel);
+    }
+
     .t-dialog__header {
       padding: 0;
       border: none;
+      background: var(--tf-bg-panel);
     }
 
     .t-dialog__body {
       padding: 0 24px;
+      background: var(--tf-bg-panel);
     }
   }
 }
@@ -403,8 +413,8 @@ function handleOk() {
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-  border-bottom: 1px solid #e9d5ff;
+  background: var(--tf-bg-panel);
+  border-bottom: 1px solid var(--tf-border-subtle);
   margin: -20px -24px 0;
 
   .header-left {
@@ -419,15 +429,15 @@ function handleOk() {
     justify-content: center;
     width: 36px;
     height: 36px;
-    background: var(--mainGradient);
+    background: var(--tf-accent-soft);
     border-radius: 10px;
-    color: #fff;
+    color: var(--tf-accent-hover);
   }
 
   .header-title {
     font-size: 18px;
     font-weight: 600;
-    color: #1a1a1a;
+    color: var(--tf-text-primary);
   }
 
   .close-btn {
@@ -436,21 +446,23 @@ function handleOk() {
     justify-content: center;
     width: 32px;
     height: 32px;
-    border: none;
-    border-radius: 8px;
+    border: 1px solid transparent;
+    border-radius: 10px;
     background: transparent;
-    color: #666;
+    color: var(--tf-text-secondary);
     cursor: pointer;
 
     &:hover {
-      background: #fff;
-      color: var(--mainColor);
+      background: var(--tf-bg-panel-2);
+      border-color: var(--tf-border-subtle);
+      color: var(--tf-text-primary);
     }
   }
 }
 
 .modal-content {
   padding: 16px 0;
+  background: var(--tf-bg-panel);
 }
 
 .toolbar {
@@ -458,17 +470,18 @@ function handleOk() {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: #fafafa;
-  border-radius: 8px;
+  background: var(--tf-bg-panel-2);
+  border: 1px solid var(--tf-border-subtle);
+  border-radius: 12px;
   margin-bottom: 16px;
 
   .toolbar-left {
     .select-info {
       font-size: 13px;
-      color: #666;
+      color: var(--tf-text-secondary);
 
       strong {
-        color: var(--mainColor);
+        color: var(--tf-text-primary);
         font-weight: 600;
         margin: 0 2px;
       }
@@ -482,33 +495,34 @@ function handleOk() {
 }
 
 .table-wrapper {
-  border: 1px solid #eee;
-  border-radius: 8px;
+  border: 1px solid var(--tf-border-subtle);
+  border-radius: 12px;
   overflow: hidden;
+  background: var(--tf-bg-panel);
 
   :deep(.vxe-table) {
     .vxe-header--column {
-      background: #fafafa;
+      background: var(--tf-bg-panel-2);
       font-weight: 600;
-      color: #333;
+      color: var(--tf-text-primary);
     }
 
     .vxe-body--row {
       &.row--hover {
-        background: #faf5ff;
+        background: rgba(124, 132, 255, 0.06);
       }
 
       &.row--current {
-        background: #f3e8ff;
+        background: var(--tf-accent-softer);
       }
     }
 
     .vxe-checkbox--icon {
-      color: var(--mainColor);
+      color: var(--tf-accent);
     }
 
     .vxe-cell--edit-icon {
-      color: #999;
+      color: var(--tf-text-muted);
     }
   }
 }
@@ -522,9 +536,9 @@ function handleOk() {
 
   .image-wrapper {
     position: relative;
-    border-radius: 6px;
+    border-radius: 10px;
     overflow: hidden;
-    border: 1px solid #eee;
+    border: 1px solid var(--tf-border-subtle);
 
     &.loading {
       opacity: 0.7;
@@ -549,13 +563,13 @@ function handleOk() {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #333;
+    color: var(--tf-text-primary);
     font-size: 13px;
   }
 
   &.video {
     .prompt-text {
-      color: #666;
+      color: var(--tf-text-secondary);
     }
   }
 
@@ -567,7 +581,7 @@ function handleOk() {
 
 .duration-text {
   font-weight: 500;
-  color: #333;
+  color: var(--tf-text-primary);
 }
 
 .modal-footer {
@@ -575,14 +589,14 @@ function handleOk() {
   align-items: center;
   justify-content: space-between;
   padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--tf-border-subtle);
 
   .footer-info {
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: 13px;
-    color: #999;
+    color: var(--tf-text-muted);
   }
 
   .footer-actions {

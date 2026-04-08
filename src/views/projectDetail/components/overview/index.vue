@@ -2,134 +2,113 @@
   <div class="overviewMain">
     <div class="overviewHeader">
       <h2 class="overviewTitle">项目概览</h2>
-      <p class="overviewSub">查看项目整体进度和统计信息</p>
     </div>
-    <div class="overviewBody">
-      <div class="overviewStats">
-        <div v-for="stat in stats" :key="stat.label" class="statGridItem">
-          <div class="statGridTop">
-            <div :class="['statIcon', stat.color]">
-              <component :is="stat.icon" :size="24" />
-            </div>
+    <div class="overviewStats">
+      <div v-for="stat in stats" :key="stat.label" :class="['statGridItem', stat.color]">
+        <div class="statGridTop">
+          <div class="statIcon">
+            <component :is="stat.icon" :size="22" />
+          </div>
+          <div class="statContent">
+            <span class="statLabel">{{ stat.label }}</span>
             <span class="statValue">{{ stat.value }}</span>
           </div>
-          <p class="statLabel">{{ stat.label }}</p>
         </div>
       </div>
-      <!-- 故事概要 -->
-      <div class="projectSummary">
-        <h3 class="summaryTitle" style="display: flex; justify-content: space-between; align-items: center">
-          <div>小说简介</div>
-          <t-button variant="text" @click="handleIntroEdit">
+    </div>
+
+    <div class="overviewPanels">
+      <section class="projectSummary overviewPanel">
+        <div class="panelHeader">
+          <div>
+            <h3 class="panelTitle">小说简介</h3>
+          </div>
+          <t-button variant="text" class="panelAction" @click="handleIntroEdit">
             <template #icon>
-              <i-editor theme="outline" size="15" fill="var(--td-brand-color)" />
+              <i-editor theme="outline" size="15" fill="currentColor" />
             </template>
             编辑
           </t-button>
-        </h3>
-        <p class="summaryText" v-if="!introEdit">{{ project?.intro || "暂无简介" }}</p>
-        <div v-else>
+        </div>
+
+        <div class="panelBody">
+          <p class="summaryText" v-if="!introEdit">{{ project?.intro || "暂无简介" }}</p>
           <a-textarea
-            style="
-              padding-left: 16px !important;
-              padding-right: 16px !important;
-              padding-bottom: 12px !important;
-              padding-top: 12px !important;
-              background-color: var(--td-bg-color-secondarycontainer) !important;
-              font-size: 1rem !important;
-            "
-            :autosize="{ minRows: 4, maxRows: 6 }"
-            v-model:value="introEditData"></a-textarea>
+            v-else
+            v-model:value="introEditData"
+            :autosize="{ minRows: 6, maxRows: 10 }"
+            class="overviewTextarea"
+            placeholder="输入项目简介..." />
         </div>
-        <div v-show="introEdit">
-          <a-divider></a-divider>
-          <div class="flex gap-2">
-            <a-button @click="() => (introEdit = false)">取消</a-button>
-            <a-button style="margin-left: 5px" type="primary" @click="updateProjectIntro">保存</a-button>
+
+        <div v-if="introEdit" class="panelFooter">
+          <a-button class="panelSecondaryBtn" @click="() => (introEdit = false)">取消</a-button>
+          <a-button class="panelPrimaryBtn" type="primary" @click="updateProjectIntro">保存</a-button>
+        </div>
+      </section>
+
+      <section class="projectInfo overviewPanel">
+        <div class="panelHeader">
+          <div>
+            <h3 class="panelTitle">全局设置</h3>
           </div>
+          <t-button v-if="!globalSettingEdit" variant="text" class="panelAction" @click="handleGlobalSettingEdit">
+            <template #icon>
+              <i-editor theme="outline" size="15" fill="currentColor" />
+            </template>
+            编辑
+          </t-button>
         </div>
-      </div>
-      <div class="projectInfo">
-        <div class="jb ac">
-          <h3 class="infoTitle">全局设置</h3>
-          <div v-show="!globalSettingEdit">
-            <t-button variant="text" @click="handleGlobalSettingEdit">
-              <template #icon>
-                <i-editor theme="outline" size="15" fill="var(--td-brand-color)" />
-              </template>
-              编辑
-            </t-button>
-          </div>
-        </div>
-        <div class="infoGrid">
+
+        <div v-if="!globalSettingEdit" class="infoList">
           <div class="infoItem">
             <label class="infoLabel">项目类型</label>
-            <div class="infoRow">
-              <span class="infoValue" v-if="!globalSettingEdit">{{ project?.projectType || "无类型" }}</span>
-              <t-select v-else v-model="projectEditData.projectType" placeholder="选择项目类型">
-                <t-option key="基于小说原文" label="基于小说原文" value="基于小说原文" />
-                <t-option key="基于剧本" label="基于剧本" value="基于剧本" />
-              </t-select>
-            </div>
+            <span class="infoValue">{{ project?.projectType || "无类型" }}</span>
           </div>
           <div class="infoItem">
             <label class="infoLabel">影片比例</label>
-            <div class="infoRow">
-              <span class="infoValue" v-if="!globalSettingEdit">{{ project?.videoRatio || "16:9" }}</span>
-              <t-select v-else v-model="projectEditData.videoRatio" placeholder="选择影片比例">
-                <t-option key="16:9" label="16:9" value="16:9" />
-                <t-option key="4:3" label="9:16" value="9:16" />
-              </t-select>
-            </div>
+            <span class="infoValue">{{ project?.videoRatio || "16:9" }}</span>
           </div>
           <div class="infoItem">
             <label class="infoLabel">画风</label>
-            <div class="infoRow">
-              <span class="infoValue" v-if="!globalSettingEdit">{{ project?.artStyle || "动漫" }}</span>
-              <a-input
-                style="
-                  padding-left: 16px !important;
-                  padding-right: 16px !important;
-                  padding-bottom: 12px !important;
-                  padding-top: 12px !important;
-                  background-color: var(--td-bg-color-secondarycontainer) !important;
-                  font-size: 1rem !important;
-                  cursor: pointer;
-                "
-                readonly
-                @click="selectArtStyle"
-                v-else
-                v-model:value="projectEditData.artStyle"
-                class="infoValue" />
-            </div>
+            <span class="infoValue">{{ project?.artStyle || "动漫" }}</span>
           </div>
           <div class="infoItem">
             <label class="infoLabel">小说类型</label>
-            <div class="infoRow">
-              <span class="infoValue" v-if="!globalSettingEdit">{{ project?.type || "无类型" }}</span>
-              <a-input
-                style="
-                  padding-left: 16px !important;
-                  padding-right: 16px !important;
-                  padding-bottom: 12px !important;
-                  padding-top: 12px !important;
-                  background-color: var(--td-bg-color-secondarycontainer) !important;
-                  font-size: 1rem !important;
-                "
-                v-else
-                v-model:value="projectEditData.type"
-                class="infoValue" />
-            </div>
+            <span class="infoValue">{{ project?.type || "无类型" }}</span>
           </div>
         </div>
-        <div v-show="globalSettingEdit">
-          <a-divider></a-divider>
-          <div class="flex gap-2">
-            <a-button @click="() => (globalSettingEdit = false)">取消</a-button>
-            <a-button style="margin-left: 5px" type="primary" @click="updateProject">保存</a-button>
+
+        <div v-else class="infoEditGrid">
+          <div class="infoField">
+            <label class="infoLabel">项目类型</label>
+            <t-select v-model="projectEditData.projectType" class="overviewSelect" placeholder="选择项目类型">
+              <t-option key="基于小说原文" label="基于小说原文" value="基于小说原文" />
+              <t-option key="基于剧本" label="基于剧本" value="基于剧本" />
+            </t-select>
+          </div>
+          <div class="infoField">
+            <label class="infoLabel">影片比例</label>
+            <t-select v-model="projectEditData.videoRatio" class="overviewSelect" placeholder="选择影片比例">
+              <t-option key="16:9" label="16:9" value="16:9" />
+              <t-option key="4:3" label="9:16" value="9:16" />
+            </t-select>
+          </div>
+          <div class="infoField">
+            <label class="infoLabel">画风</label>
+            <a-input v-model:value="projectEditData.artStyle" class="overviewInput" placeholder="选择画风" readonly @click="selectArtStyle" />
+          </div>
+          <div class="infoField">
+            <label class="infoLabel">小说类型</label>
+            <a-input v-model:value="projectEditData.type" class="overviewInput" placeholder="输入小说类型" />
           </div>
         </div>
-      </div>
+
+        <div v-if="globalSettingEdit" class="panelFooter">
+          <a-button class="panelSecondaryBtn" @click="() => (globalSettingEdit = false)">取消</a-button>
+          <a-button class="panelPrimaryBtn" type="primary" @click="updateProject">保存</a-button>
+        </div>
+      </section>
     </div>
     <artStyle v-model:artStyleShow="artStyleShow" v-model:artStyleData="projectEditData.artStyle" />
   </div>
@@ -137,7 +116,6 @@
 
 <script setup lang="ts">
 import axios from "@/utils/axios";
-import { message } from "ant-design-vue";
 import store from "@/stores";
 import artStyle from "@/views/project/components/artStyle.vue";
 const { project, projectId } = storeToRefs(store());
@@ -194,7 +172,7 @@ const stats = computed(() => [
     label: "角色数量",
     value: statsData.value.roleCount || 0,
     icon: "i-peoples",
-    color: "statPurple",
+    color: "statMint",
   },
   {
     label: "剧本集数",
@@ -206,13 +184,13 @@ const stats = computed(() => [
     label: "分镜数量",
     value: statsData.value.storyboardCount || 0,
     icon: "i-carousel-video",
-    color: "statGreen",
+    color: "statEmerald",
   },
   {
     label: "视频数量",
     value: statsData.value.videoCount || 0,
     icon: "i-video-one",
-    color: "statOrange",
+    color: "statAmber",
   },
 ]);
 function updateProjectIntro() {
@@ -226,7 +204,7 @@ function updateProjectIntro() {
       window.$message.success("项目简介更新成功");
       introEdit.value = false;
     })
-    .catch((e) => {
+    .catch(() => {
       window.$message.error("项目简介更新失败");
     });
 }
@@ -255,198 +233,370 @@ function selectArtStyle() {
 </script>
 
 <style lang="scss" scoped>
-.overviewHeader {
-  margin-bottom: 32px;
-  .overviewTitle {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--td-text-color-primary);
-    margin-bottom: 8px;
-  }
-  .overviewSub {
-    color: var(--td-text-color-secondary);
-  }
-}
-.overviewBody {
+.overviewMain {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  .overviewStats {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 24px;
-    @media (min-width: 640px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    @media (min-width: 1024px) {
-      grid-template-columns: repeat(4, 1fr);
-    }
-    .statGridItem {
-      background: var(--td-bg-color-container);
-      border: 1px solid var(--td-border-level-1-color);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: var(--td-shadow-1);
-      .statGridTop {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
-        .statIcon {
-          width: 38px;
-          height: 38px;
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          &.statPurple {
-            background: var(--td-brand-color-light);
-            color: var(--td-brand-color);
-          }
-          &.statBlue {
-            background: rgba(33, 119, 227, 0.1);
-            color: #2177e3;
-          }
-          &.statGreen {
-            background: var(--td-success-color-light);
-            color: var(--td-success-color);
-          }
-          &.statOrange {
-            background: var(--td-warning-color-light);
-            color: var(--td-warning-color);
-          }
-        }
-        .statValue {
-          font-size: 26px;
-          font-weight: bold;
-          color: var(--td-text-color-primary);
-        }
-      }
-      .statLabel {
-        font-size: 13px;
-        color: var(--td-text-color-secondary);
-      }
-    }
+}
+
+.overviewHeader {
+  .overviewTitle {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--tf-text-primary);
   }
-  .projectInfo {
-    background: var(--td-bg-color-container);
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid var(--td-border-level-1-color);
-    box-shadow: var(--td-shadow-1);
-    .infoTitle {
-      font-weight: 600;
-      color: var(--td-text-color-primary);
-      margin-bottom: 18px;
-    }
-    .infoGrid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
-      @media (min-width: 600px) {
-        grid-template-columns: 1fr 1fr;
-      }
-      .infoItem {
-        .infoLabel {
-          font-size: 12px;
-          color: var(--td-text-color-secondary);
-          margin-bottom: 3px;
-          display: block;
-        }
-        .infoRow {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          .infoValue {
-            color: var(--td-text-color-primary);
-            font-weight: 500;
-          }
-          .iconGray {
-            color: var(--td-text-color-placeholder);
-          }
-        }
-      }
-    }
+
+  .overviewSub {
+    margin: 0;
+    color: var(--tf-text-secondary);
+    font-size: 14px;
   }
-  .projectSummary {
-    background: var(--td-bg-color-container);
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid var(--td-border-level-1-color);
-    box-shadow: var(--td-shadow-1);
-    .summaryTitle {
-      font-weight: 600;
-      color: var(--td-text-color-primary);
-      margin-bottom: 14px;
-    }
-    .summaryText {
-      color: var(--td-text-color-secondary);
-      line-height: 1.7;
-    }
+}
+
+.overviewStats {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 24px;
+  padding-bottom: 28px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
   }
-  .projectEvents {
-    background: var(--td-bg-color-container);
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid var(--td-border-level-1-color);
-    box-shadow: var(--td-shadow-1);
-    .eventsTitle {
-      font-weight: 600;
-      color: var(--td-text-color-primary);
-      margin-bottom: 14px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 1120px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .statGridItem {
+    position: relative;
+    min-height: 182px;
+    padding: 34px 22px 28px;
+    border-radius: 18px;
+    border: 1px solid rgba(98, 224, 172, 0.22);
+    background: rgba(255, 255, 255, 0.018);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 16px 36px rgba(0, 0, 0, 0.24);
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      border: 1px solid transparent;
+      opacity: 0.65;
     }
-    .eventsList {
+
+    &.statMint::after {
+      border-color: rgba(98, 224, 172, 0.42);
+      box-shadow: 0 0 24px rgba(98, 224, 172, 0.12);
+    }
+
+    &.statBlue::after {
+      border-color: rgba(98, 224, 172, 0.38);
+      box-shadow: 0 0 24px rgba(98, 224, 172, 0.1);
+    }
+
+    &.statEmerald::after {
+      border-color: rgba(98, 224, 172, 0.38);
+      box-shadow: 0 0 24px rgba(98, 224, 172, 0.1);
+    }
+
+    &.statAmber::after {
+      border-color: rgba(98, 224, 172, 0.38);
+      box-shadow: 0 0 24px rgba(98, 224, 172, 0.1);
+    }
+
+    .statGridTop {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 0;
+      min-height: 100%;
+      padding-inline: 10px;
+    }
+
+    .statContent {
       display: flex;
       flex-direction: column;
-      gap: 11px;
-      max-height: 380px;
-      overflow-y: auto;
-      .eventsItem {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 14px;
-        background: var(--td-bg-color-secondarycontainer);
-        border-radius: 10px;
-        .eventsLeft {
-          flex-shrink: 0;
-          width: 62px;
-          text-align: center;
-          .eventsEp {
-            font-size: 10px;
-            color: var(--td-text-color-placeholder);
-            margin-bottom: 2px;
-          }
-          .eventsScore {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            .scoreIcon {
-              color: var(--td-brand-color);
-            }
-            .scoreVal {
-              font-size: 13px;
-              font-weight: 600;
-              color: var(--td-brand-color);
-            }
-          }
-        }
-        .eventsRight {
-          flex: 1;
-          .eventsTitle {
-            font-size: 15px;
-            font-weight: 500;
-            margin-bottom: 3px;
-            color: var(--td-text-color-primary);
-          }
-          .eventsDesc {
-            font-size: 13px;
-            color: var(--td-text-color-secondary);
-          }
-        }
-      }
+      align-items: flex-start;
+      justify-content: center;
+      gap: 18px;
+      flex: 0 1 200px;
+      min-width: 0;
     }
+
+    .statIcon {
+      width: 48px;
+      height: 48px;
+      transform: translateX(-18px);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #62e0ac;
+      background: rgba(98, 224, 172, 0.1);
+      border: 1px solid rgba(98, 224, 172, 0.16);
+    }
+
+    &.statMint .statIcon {
+      color: #62e0ac;
+    }
+
+    &.statBlue .statIcon {
+      color: #62e0ac;
+    }
+
+    &.statEmerald .statIcon {
+      color: #62e0ac;
+    }
+
+    &.statAmber .statIcon {
+      color: #62e0ac;
+    }
+
+    .statLabel {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--tf-text-primary);
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    .statValue {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--tf-text-primary);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+  }
+}
+
+.overviewPanels {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  @media (min-width: 1120px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.overviewPanel {
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  padding: 24px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.016);
+  border: 1px solid var(--tf-border-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 18px 36px rgba(0, 0, 0, 0.22);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+
+  .panelTitle {
+    margin: 0 0 6px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--tf-text-primary);
+  }
+
+  .panelDescription {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--tf-text-secondary);
+    max-width: 320px;
+  }
+}
+
+.panelAction {
+  color: var(--tf-text-secondary);
+  border-radius: 10px;
+
+  &:hover {
+    color: var(--tf-accent-hover);
+    background: rgba(124, 132, 255, 0.08);
+  }
+}
+
+.panelBody {
+  flex: 1;
+}
+
+.summaryText {
+  margin: 0;
+  color: var(--tf-text-secondary);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.panelFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.panelSecondaryBtn {
+  border-radius: 10px;
+}
+
+.panelPrimaryBtn {
+  border-radius: 10px;
+}
+
+.infoList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+
+  .infoItem {
+    display: grid;
+    grid-template-columns: minmax(120px, 160px) 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    &:first-child {
+      padding-top: 0;
+    }
+  }
+}
+
+.infoEditGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+
+  @media (min-width: 720px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.infoField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.infoLabel {
+  font-size: 12px;
+  color: var(--tf-text-tertiary);
+  letter-spacing: 0.02em;
+}
+
+.infoValue {
+  color: var(--tf-text-primary);
+  font-size: 15px;
+  font-weight: 500;
+  justify-self: end;
+  text-align: right;
+}
+
+:deep(.overviewTextarea .ant-input),
+:deep(.overviewInput.ant-input) {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border-color: var(--tf-border-strong);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--tf-text-primary);
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  &:focus,
+  &:focus-within {
+    border-color: rgba(124, 132, 255, 0.42);
+    box-shadow: 0 0 0 3px rgba(124, 132, 255, 0.12);
+  }
+}
+
+:deep(.overviewTextarea .ant-input::placeholder),
+:deep(.overviewInput.ant-input::placeholder) {
+  color: var(--tf-text-tertiary);
+}
+
+:deep(.overviewSelect .t-input),
+:deep(.overviewSelect .t-input__inner) {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--tf-border-strong);
+  color: var(--tf-text-primary);
+}
+
+:deep(.overviewSelect .t-input:hover) {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+:deep(.overviewSelect .t-input.is-focused) {
+  border-color: rgba(124, 132, 255, 0.42);
+  box-shadow: 0 0 0 3px rgba(124, 132, 255, 0.12);
+}
+
+:deep(.overviewSelect .t-input__inner::placeholder) {
+  color: var(--tf-text-tertiary);
+}
+
+:deep(.overviewSelect .t-input__suffix),
+:deep(.overviewSelect .t-select__right-icon) {
+  color: var(--tf-text-tertiary);
+}
+
+:deep(.panelSecondaryBtn.ant-btn) {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--tf-border-strong);
+  color: var(--tf-text-secondary);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: var(--tf-text-primary);
+  }
+}
+
+:deep(.panelPrimaryBtn.ant-btn-primary) {
+  background: var(--tf-accent);
+  border-color: var(--tf-accent);
+
+  &:hover {
+    background: var(--tf-accent-hover);
+    border-color: var(--tf-accent-hover);
   }
 }
 </style>

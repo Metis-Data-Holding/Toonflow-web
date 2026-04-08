@@ -4,7 +4,7 @@
     <div class="form-row" v-if="editable">
       <label>模型</label>
       <t-select v-model:value="localConfig.aiConfigId" @change="onManufacturerChange" :disabled="selectManfactDis" size="small">
-        <t-option v-for="item in availableManufacturers" :value="item.value" :label="item.label" :key="item.value">
+        <t-option v-for="item in availableManufacturerOptions" :value="item.value" :label="item.label" :key="item.value">
           {{ item.label }}
         </t-option>
       </t-select>
@@ -396,8 +396,9 @@ async function generatePrompt() {
     localConfig.prompt = res.data;
     emitChange();
     window.$message.success("提示词生成成功");
-  } catch (e: any) {
-    window.$message.error(e?.message || "生成失败");
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : "生成失败";
+    window.$message.error(errorMessage);
   } finally {
     promptLoading.value = false;
   }
@@ -414,7 +415,7 @@ const manufacturerAllRecord: Record<string, string> = Object.values(manufacturer
   acc[c.value as string] = c.label;
   return acc;
 }, {});
-const availableManufacturers = computed(() => {
+const availableManufacturerOptions = computed(() => {
   if (manufacturerList.value.length === 0) return [];
 
   return manufacturerList.value.map((i) => ({
@@ -448,6 +449,10 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .video-config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
   .form-row {
     display: flex;
     align-items: center;
@@ -461,12 +466,12 @@ onMounted(() => {
       width: 70px;
       flex-shrink: 0;
       font-size: 13px;
-      color: var(--text-secondary);
+      color: var(--tf-text-secondary);
       line-height: 24px;
     }
 
     .value {
-      color: var(--text-primary);
+      color: var(--tf-text-primary);
       font-size: 13px;
       font-weight: 500;
     }
@@ -474,13 +479,13 @@ onMounted(() => {
     .unit {
       margin-left: 6px;
       font-size: 12px;
-      color: var(--text-secondary);
+      color: var(--tf-text-secondary);
     }
 
     .tip {
       margin-left: 8px;
       font-size: 11px;
-      color: var(--text-tertiary);
+      color: var(--tf-text-tertiary);
     }
 
     &.frame-row {
@@ -511,10 +516,10 @@ onMounted(() => {
         .magic-btn {
           padding: 0;
           height: auto;
-          color: var(--mainColor);
+          color: var(--tf-accent);
 
           &:hover {
-            color: var(--mainColorDark);
+            color: var(--tf-accent-hover);
           }
         }
       }
@@ -530,8 +535,8 @@ onMounted(() => {
     width: 150px;
     height: auto;
     min-height: 70px;
-    border: 1px dashed var(--td-border-level-1-color);
-    border-radius: 4px;
+    border: 1px dashed var(--tf-border-strong);
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -540,9 +545,9 @@ onMounted(() => {
     transition: all 0.2s;
     position: relative;
     overflow: hidden;
-    background: var(--td-bg-color-container);
+    background: rgba(255, 255, 255, 0.03);
     font-size: 10px;
-    color: var(--td-text-color);
+    color: var(--tf-text-secondary);
 
     &.single-frame {
       width: 100px;
@@ -550,13 +555,13 @@ onMounted(() => {
     }
 
     &:hover {
-      border-color: #1890ff;
-      background: var(--td-bg-color);
+      border-color: rgba(124, 132, 255, 0.3);
+      background: rgba(255, 255, 255, 0.05);
     }
 
     &.has-image {
       border-style: solid;
-      border-color: #52c41a;
+      border-color: rgba(34, 197, 94, 0.32);
 
       img {
         width: 100%;
@@ -569,8 +574,8 @@ onMounted(() => {
         bottom: 0;
         left: 0;
         right: 0;
-        background: rgba(0, 0, 0, 0.5);
-        color: #fff;
+        background: rgba(11, 13, 16, 0.72);
+        color: var(--tf-text-primary);
         font-size: 10px;
         text-align: center;
         padding: 1px 0;
@@ -580,8 +585,8 @@ onMounted(() => {
         position: absolute;
         top: 0;
         right: 0;
-        background: var(--bg-overlay, rgba(255, 255, 255, 0.9));
-        border-radius: 0 0 0 4px;
+        background: rgba(11, 13, 16, 0.78);
+        border-radius: 0 0 0 10px;
         width: 18px;
         height: 18px;
         padding: 0;
@@ -620,9 +625,9 @@ onMounted(() => {
       position: relative;
       width: 150px;
       height: auto;
-      border-radius: 6px;
+      border-radius: 12px;
       overflow: hidden;
-      border: 1px solid #52c41a;
+      border: 1px solid rgba(34, 197, 94, 0.32);
 
       .drag-handle {
         width: 100%;
@@ -643,8 +648,8 @@ onMounted(() => {
         position: absolute;
         top: 2px;
         left: 2px;
-        background: rgba(0, 0, 0, 0.6);
-        color: #fff;
+        background: rgba(11, 13, 16, 0.72);
+        color: var(--tf-text-primary);
         font-size: 10px;
         padding: 1px 4px;
         border-radius: 3px;
@@ -655,8 +660,8 @@ onMounted(() => {
         position: absolute;
         top: 0;
         right: 0;
-        background: var(--bg-overlay, rgba(255, 255, 255, 0.9));
-        border-radius: 0 0 0 4px;
+        background: rgba(11, 13, 16, 0.78);
+        border-radius: 0 0 0 10px;
         width: 18px;
         height: 18px;
         padding: 0;
@@ -676,28 +681,82 @@ onMounted(() => {
 
     .ghost {
       opacity: 0.5;
-      background: var(--mainColorLight);
+      background: rgba(124, 132, 255, 0.12);
     }
 
     .add-image-box {
       width: 150px;
       height: 70px;
-      border: 1px dashed #d9d9d9;
-      border-radius: 4px;
+      border: 1px dashed var(--tf-border-strong);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s;
-      background: #fafafa;
+      background: rgba(255, 255, 255, 0.03);
       font-size: 12px;
-      color: #999;
+      color: var(--tf-text-tertiary);
 
       &:hover {
-        border-color: #1890ff;
-        background: #e6f7ff;
+        border-color: rgba(124, 132, 255, 0.3);
+        background: rgba(124, 132, 255, 0.08);
+        color: var(--tf-text-primary);
       }
     }
+  }
+
+  :deep(.t-select__wrap),
+  :deep(.t-input-number) {
+    border-radius: 10px;
+  }
+
+  :deep(.t-input),
+  :deep(.t-select__control),
+  :deep(.t-input-number) {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--tf-border-strong);
+    color: var(--tf-text-primary);
+  }
+
+  :deep(.t-input:hover),
+  :deep(.t-select__control:hover),
+  :deep(.t-input-number:hover) {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  :deep(.t-input--focused),
+  :deep(.t-select--focused .t-select__control),
+  :deep(.t-input-number--focused) {
+    border-color: rgba(124, 132, 255, 0.42);
+    box-shadow: 0 0 0 3px rgba(124, 132, 255, 0.12);
+  }
+
+  :deep(.ant-input),
+  :deep(.ant-input-textarea textarea) {
+    border-radius: 10px;
+    border-color: var(--tf-border-strong);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--tf-text-primary);
+  }
+
+  :deep(.ant-input:hover),
+  :deep(.ant-input-textarea textarea:hover) {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  :deep(.ant-input:focus),
+  :deep(.ant-input-textarea textarea:focus) {
+    border-color: rgba(124, 132, 255, 0.42);
+    box-shadow: 0 0 0 3px rgba(124, 132, 255, 0.12);
+  }
+
+  :deep(.ant-switch) {
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  :deep(.ant-switch.ant-switch-checked) {
+    background: var(--tf-accent);
   }
 }
 </style>

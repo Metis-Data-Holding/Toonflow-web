@@ -7,16 +7,21 @@
           <button class="backBtn" @click="onBack">
             <i-left :size="20" />
           </button>
-          <div class="info ac">
-            <h1 class="title">{{ project?.name }}</h1>
-            <p class="meta">
-              <span v-if="project?.updatedAt && project?.updatedAt > 0">最后更新 {{ dayjs(project?.updatedAt).format("YYYY-MM-DD HH:mm:ss") }}</span>
-            </p>
+          <div class="titleBlock">
+            <span class="eyebrow">Project Workspace</span>
+            <div class="info ac">
+              <h1 class="title">{{ project?.name }}</h1>
+              <p class="meta">
+                <span v-if="project?.updatedAt && project?.updatedAt > 0">
+                  最后更新 {{ dayjs(project?.updatedAt).format("YYYY-MM-DD HH:mm:ss") }}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
       <!-- sub nav -->
-      <div class="jb ac">
+      <div class="navWrap">
         <div class="nav">
           <button
             v-for="item in subNavItems"
@@ -42,7 +47,7 @@
       <assetsManager v-if="currentSubView === 'assets'" />
       <scriptManager v-if="currentSubView === 'script'" />
     </div>
-    <myTask v-model="visible" v-if="visible"/>
+    <myTask v-model="visible" v-if="visible" />
   </div>
 </template>
 
@@ -94,16 +99,34 @@ function taskFn() {
 
 <style lang="scss" scoped>
 .projectDetail {
-  min-width: 800px;
+  min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: transparent;
 
   .detailHeader {
-    height: 100px;
-    background: var(--td-bg-color-container);
-    border-bottom: 1px solid var(--td-border-level-1-color);
-    padding: 8px 24px 8px 32px;
+    position: relative;
+    padding: 28px 32px 0;
+    background: var(--tf-bg-panel);
+    border-bottom: 1px solid var(--tf-border-subtle);
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: auto 32px 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.02) 0%,
+        rgba(255, 255, 255, 0.08) 18%,
+        rgba(255, 255, 255, 0.08) 82%,
+        rgba(255, 255, 255, 0.02) 100%
+      );
+      pointer-events: none;
+    }
 
     .headerBar {
       display: flex;
@@ -112,68 +135,144 @@ function taskFn() {
 
       .headerLeft {
         display: flex;
-        align-items: center;
-        gap: 16px;
+        align-items: flex-start;
+        gap: 18px;
 
         .backBtn {
-          padding: 8px;
-          color: var(--td-text-color-secondary);
-          border-radius: 8px;
-          background: none;
-          transition: background 0.2s;
+          width: 40px;
+          height: 40px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid var(--tf-border-subtle);
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.03);
+          color: var(--tf-text-secondary);
+          cursor: pointer;
+          transition:
+            color 0.18s ease,
+            border-color 0.18s ease,
+            background-color 0.18s ease,
+            transform 0.18s ease;
 
           &:hover {
-            background: var(--td-bg-color-secondarycontainer);
+            color: var(--tf-text-primary);
+            border-color: rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(-1px);
           }
-          border: none;
-          outline: none;
-          cursor: pointer;
-          display: flex;
         }
 
-        .info {
-          .title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--td-text-color-primary);
-            margin: 0;
+        .titleBlock {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          .eyebrow {
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(167, 176, 190, 0.72);
           }
-          .meta {
-            font-size: 13px;
-            color: var(--td-text-color-secondary);
+
+          .info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+
+            .title {
+              margin: 0;
+              font-size: 30px;
+              line-height: 1.12;
+              font-weight: 650;
+              letter-spacing: -0.02em;
+              color: var(--tf-text-primary);
+            }
+
+            .meta {
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              font-size: 13px;
+              color: var(--tf-text-secondary);
+              margin: 8px 0 0;
+              flex-wrap: wrap;
+
+              .metaDivider {
+                width: 4px;
+                height: 4px;
+                border-radius: 999px;
+                background: rgba(167, 176, 190, 0.52);
+              }
+            }
           }
         }
       }
     }
 
+    .navWrap {
+      margin-top: 22px;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.08);
+        z-index: 0;
+      }
+    }
+
     .nav {
-      margin-top: 5px;
+      position: relative;
+      z-index: 1;
       display: flex;
-      gap: 8px;
+      gap: 26px;
       overflow-x: auto;
 
       .navBtn {
+        position: relative;
         display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
+        gap: 8px;
+        padding: 0 2px 16px;
         font-size: 14px;
-        border-radius: 8px;
-        background: var(--td-bg-color-secondarycontainer);
-        color: var(--td-text-color-primary);
+        border-radius: 0;
+        background: transparent;
+        color: var(--tf-text-secondary);
         white-space: nowrap;
         border: none;
         outline: none;
         cursor: pointer;
-        transition: all 0.18s;
+        transition:
+          color 0.18s ease,
+          opacity 0.18s ease;
 
         &.navActive {
-          background: var(--td-brand-color);
-          color: var(--td-text-color-anti);
+          color: #62e0ac;
+
+          &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            border-radius: 999px;
+            background: currentColor;
+            box-shadow: 0 0 16px rgba(98, 224, 172, 0.32);
+            z-index: 2;
+          }
         }
 
         &:not(.navActive):hover {
-          background: var(--td-bg-color-secondarycontainer-hover);
+          color: var(--tf-text-primary);
+        }
+
+        :deep(svg) {
+          opacity: 0.8;
+          color: currentColor;
         }
 
         .navLabel {
@@ -184,11 +283,11 @@ function taskFn() {
   }
 
   .main {
-    height: calc(100vh - 100px);
-    overflow: auto;
-    padding-left: 5%;
-    padding-right: 5%;
-    padding-bottom: 50px;
+    min-width: 0;
+    height: calc(100vh - 170px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px 32px 48px;
   }
 }
 </style>

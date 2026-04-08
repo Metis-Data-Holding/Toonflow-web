@@ -92,13 +92,13 @@
         <div v-else class="table-wrapper">
           <vxe-table
             ref="tableRef"
+            class="assets-table"
             :data="projectElements"
             :cell-config="{ height: props.batch ? 300 : 140 }"
             :row-config="{ keyField: 'id', resizable: true }"
             :radio-config="{ reserve: true }"
             :checkbox-config="{ reserve: true }"
             round
-            stripe
             @checkbox-all="handleCheckedAll"
             @checkbox-change="handleCheckedChange">
             <vxe-column v-if="props.way" :type="props.way" title="选择" width="80" align="center" />
@@ -419,8 +419,9 @@ async function handleBatchGeneratePrompt() {
       });
       const idx = selectModal.value!.findIndex((i) => i.id === res.data.assetsId);
       if (idx !== -1) selectModal.value![idx].prompt = res.data.prompt;
-    } catch (e: any) {
-      message.error(e.message ?? "提示词生成失败");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "提示词生成失败";
+      message.error(errorMessage);
     }
   });
   batchPromptLoading.value = false;
@@ -469,25 +470,20 @@ watch(batchShow, (val) => {
 </script>
 
 <style lang="scss" scoped>
-:root {
-  --mainColor: #9810fa;
-  --mainColorLight: #faf5ff;
-  --mainColorHover: #7c0dd4;
-  --mainGradient: linear-gradient(135deg, #9810fa 0%, #7c3aed 100%);
-}
-
 .element-manager {
   margin-top: 20px;
-  // 头部
+  min-width: 0;
+
   .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 20px 24px;
-    background: linear-gradient(135deg, var(--mainColorLight) 0%, #f0f9ff 50%, #eff6ff 100%);
+    background: var(--tf-surface-panel);
     border-radius: 16px;
-    border: 1px solid rgba(152, 16, 250, 0.1);
+    border: 1px solid var(--tf-border-strong);
     margin-bottom: 20px;
+    box-shadow: var(--tf-shadow-soft);
 
     .header-content {
       display: flex;
@@ -500,10 +496,10 @@ watch(batchShow, (val) => {
         justify-content: center;
         width: 48px;
         height: 48px;
-        background: linear-gradient(135deg, var(--mainColor), #7c3aed);
-        border-radius: 14px;
-        color: #fff;
-        box-shadow: 0 6px 20px rgba(152, 16, 250, 0.35);
+        background: rgba(124, 132, 255, 0.14);
+        border: 1px solid rgba(124, 132, 255, 0.2);
+        border-radius: 12px;
+        color: var(--tf-accent);
       }
 
       .header-text {
@@ -511,13 +507,13 @@ watch(batchShow, (val) => {
           margin: 0 0 4px;
           font-size: 20px;
           font-weight: 700;
-          color: #1f2937;
+          color: var(--tf-text-primary);
         }
 
         .subtitle {
           margin: 0;
           font-size: 14px;
-          color: #6b7280;
+          color: var(--tf-text-secondary);
         }
       }
     }
@@ -527,43 +523,45 @@ watch(batchShow, (val) => {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 12px 24px;
-        background: #fff;
+        min-width: 92px;
+        padding: 10px 18px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--tf-border-subtle);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 
         .stat-value {
-          font-size: 24px;
+          font-size: 22px;
           font-weight: 700;
-          color: var(--mainColor);
+          color: #62e0ac;
         }
 
         .stat-label {
           font-size: 12px;
-          color: #9ca3af;
+          color: var(--tf-text-tertiary);
           margin-top: 2px;
         }
       }
     }
   }
 
-  // 工具栏
   .toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    background: #fff;
-    border-radius: 14px;
-    border: 1px solid #f3f4f6;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    background: var(--tf-surface-panel);
+    border-radius: 16px;
+    border: 1px solid var(--tf-border-strong);
+    box-shadow: var(--tf-shadow-soft);
     margin-bottom: 20px;
 
     .tab-group {
       display: flex;
       gap: 8px;
       padding: 4px;
-      background: #f9fafb;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 12px;
 
       .tab-btn {
@@ -576,19 +574,27 @@ watch(batchShow, (val) => {
         border-radius: 10px;
         font-size: 14px;
         font-weight: 500;
-        color: #6b7280;
+        color: var(--tf-text-secondary);
         cursor: pointer;
-        transition: all 0.25s ease;
+        transition:
+          background-color 0.18s ease,
+          color 0.18s ease,
+          box-shadow 0.18s ease;
 
         &:hover {
-          color: var(--mainColor);
-          background: rgba(152, 16, 250, 0.08);
+          color: var(--tf-text-primary);
+          background: rgba(255, 255, 255, 0.05);
         }
 
         &.active {
-          background: linear-gradient(135deg, var(--mainColor), #7c3aed);
-          color: #fff;
-          box-shadow: 0 4px 12px rgba(152, 16, 250, 0.35);
+          background: rgba(124, 132, 255, 0.14);
+          color: var(--tf-text-primary);
+          box-shadow: inset 0 0 0 1px rgba(124, 132, 255, 0.22);
+
+          svg,
+          i {
+            color: var(--tf-accent-hover);
+          }
         }
       }
     }
@@ -607,27 +613,35 @@ watch(batchShow, (val) => {
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.25s ease;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease,
+          background-color 0.18s ease,
+          border-color 0.18s ease,
+          color 0.18s ease;
 
         &.primary {
-          background: linear-gradient(135deg, var(--mainColor), #7c3aed);
+          background: var(--tf-accent);
           color: #fff;
-          box-shadow: 0 4px 14px rgba(152, 16, 250, 0.35);
+          box-shadow: 0 10px 24px rgba(124, 132, 255, 0.18);
 
           &:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(152, 16, 250, 0.45);
+            transform: translateY(-1px);
+            background: var(--tf-accent-hover);
+            box-shadow: 0 14px 28px rgba(124, 132, 255, 0.22);
           }
         }
 
         &.secondary {
-          background: var(--mainColorLight);
-          color: var(--mainColor);
-          border: 1px solid rgba(152, 16, 250, 0.2);
+          background: rgba(255, 255, 255, 0.03);
+          color: var(--tf-text-secondary);
+          border: 1px solid var(--tf-border-subtle);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 
           &:hover:not(:disabled) {
-            background: rgba(152, 16, 250, 0.15);
-            border-color: rgba(152, 16, 250, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--tf-text-primary);
+            border-color: rgba(255, 255, 255, 0.16);
           }
         }
 
@@ -642,13 +656,15 @@ watch(batchShow, (val) => {
 
   // 内容区
   .content-body {
-    // 剧本选择器
+    min-width: 0;
+
     .script-selector {
       padding: 16px 20px;
-      background: #fff;
-      border-radius: 14px;
-      border: 1px solid #f3f4f6;
+      background: var(--tf-surface-panel);
+      border-radius: 16px;
+      border: 1px solid var(--tf-border-strong);
       margin-bottom: 20px;
+      box-shadow: var(--tf-shadow-soft);
 
       .script-label {
         display: flex;
@@ -657,7 +673,7 @@ watch(batchShow, (val) => {
         margin-bottom: 14px;
         font-size: 14px;
         font-weight: 600;
-        color: #374151;
+        color: var(--tf-text-primary);
       }
 
       .script-list {
@@ -667,40 +683,40 @@ watch(batchShow, (val) => {
 
         .script-btn {
           padding: 8px 18px;
-          background: #f9fafb;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid var(--tf-border-subtle);
+          border-radius: 10px;
           font-size: 13px;
-          color: #4b5563;
+          color: var(--tf-text-secondary);
           cursor: pointer;
           transition: all 0.2s ease;
 
           &:hover {
-            border-color: var(--mainColor);
-            color: var(--mainColor);
-            background: var(--mainColorLight);
+            border-color: rgba(124, 132, 255, 0.22);
+            color: var(--tf-text-primary);
+            background: rgba(255, 255, 255, 0.05);
           }
 
           &.active {
-            background: linear-gradient(135deg, var(--mainColor), #7c3aed);
+            background: var(--tf-accent);
             color: #fff;
             border-color: transparent;
-            box-shadow: 0 3px 10px rgba(152, 16, 250, 0.3);
+            box-shadow: 0 10px 24px rgba(124, 132, 255, 0.18);
           }
         }
       }
     }
 
-    // 空状态
     .empty-state {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 80px 40px;
-      background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
-      border-radius: 20px;
-      border: 2px dashed #e5e7eb;
+      background: var(--tf-surface-panel);
+      border-radius: 16px;
+      border: 1px dashed var(--tf-border-strong);
+      box-shadow: var(--tf-shadow-soft);
 
       .empty-icon {
         width: 100px;
@@ -708,9 +724,10 @@ watch(batchShow, (val) => {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, var(--mainColorLight), #f3e8ff);
+        background: rgba(124, 132, 255, 0.1);
+        border: 1px solid rgba(124, 132, 255, 0.18);
         border-radius: 50%;
-        color: var(--mainColor);
+        color: var(--tf-accent);
         margin-bottom: 24px;
       }
 
@@ -718,13 +735,13 @@ watch(batchShow, (val) => {
         margin: 0 0 8px;
         font-size: 18px;
         font-weight: 600;
-        color: #1f2937;
+        color: var(--tf-text-primary);
       }
 
       .empty-desc {
         margin: 0 0 24px;
         font-size: 14px;
-        color: #9ca3af;
+        color: var(--tf-text-secondary);
         text-align: center;
         max-width: 300px;
       }
@@ -734,35 +751,52 @@ watch(batchShow, (val) => {
         align-items: center;
         gap: 8px;
         padding: 12px 28px;
-        background: linear-gradient(135deg, var(--mainColor), #7c3aed);
+        background: var(--tf-accent);
         color: #fff;
         border: none;
         border-radius: 12px;
         font-size: 15px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.25s ease;
-        box-shadow: 0 4px 14px rgba(152, 16, 250, 0.35);
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease,
+          background-color 0.18s ease;
+        box-shadow: 0 10px 24px rgba(124, 132, 255, 0.18);
 
         &:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 24px rgba(152, 16, 250, 0.45);
+          transform: translateY(-1px);
+          background: var(--tf-accent-hover);
+          box-shadow: 0 14px 28px rgba(124, 132, 255, 0.22);
         }
       }
     }
 
-    // 表格
     .table-wrapper {
-      background: #fff;
+      position: relative;
+      min-width: 0;
+      background: var(--tf-surface-panel);
       border-radius: 16px;
-      border: 1px solid #f3f4f6;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--tf-border-strong);
+      overflow-x: auto;
+      overflow-y: hidden;
+      box-shadow: var(--tf-shadow-soft);
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 0%, rgba(124, 132, 255, 0.26) 35%, rgba(124, 132, 255, 0.08) 100%);
+        pointer-events: none;
+        z-index: 2;
+      }
 
       .name-cell {
         .name-text {
           font-weight: 600;
-          color: #1f2937;
+          color: var(--tf-text-primary);
+          letter-spacing: 0.01em;
         }
       }
 
@@ -775,7 +809,7 @@ watch(batchShow, (val) => {
           height: 100px;
           object-fit: cover;
           border-radius: 10px;
-          border: 1px solid #f3f4f6;
+          border: 1px solid var(--tf-border-subtle);
         }
 
         .no-image {
@@ -786,10 +820,11 @@ watch(batchShow, (val) => {
           align-items: center;
           justify-content: center;
           gap: 6px;
-          background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+          background: rgba(255, 255, 255, 0.03);
           border-radius: 10px;
-          color: #9ca3af;
+          color: var(--tf-text-tertiary);
           font-size: 12px;
+          border: 1px dashed var(--tf-border-subtle);
         }
       }
 
@@ -798,8 +833,8 @@ watch(batchShow, (val) => {
       .remark-text {
         margin: 0;
         font-size: 13px;
-        color: #4b5563;
-        line-height: 1.6;
+        color: var(--tf-text-secondary);
+        line-height: 1.7;
         display: -webkit-box;
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
@@ -807,22 +842,16 @@ watch(batchShow, (val) => {
       }
 
       .prompt-textarea {
-        border-radius: 8px;
-        border-color: #e5e7eb;
         font-size: 13px;
-
-        &:focus {
-          border-color: var(--mainColor);
-          box-shadow: 0 0 0 3px rgba(152, 16, 250, 0.1);
-        }
       }
 
       .duration-badge {
         display: inline-block;
         padding: 4px 12px;
-        background: linear-gradient(135deg, var(--mainColorLight), #f3e8ff);
-        color: var(--mainColor);
-        border-radius: 20px;
+        background: rgba(124, 132, 255, 0.12);
+        color: var(--tf-accent);
+        border-radius: 999px;
+        border: 1px solid rgba(124, 132, 255, 0.18);
         font-size: 13px;
         font-weight: 600;
       }
@@ -837,35 +866,38 @@ watch(batchShow, (val) => {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 36px;
-          height: 36px;
-          background: transparent;
-          border: none;
-          border-radius: 10px;
+          width: 34px;
+          height: 34px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid var(--tf-border-subtle);
+          border-radius: 9px;
           cursor: pointer;
           transition: all 0.2s ease;
 
           &.edit {
-            color: var(--mainColor);
+            color: rgba(124, 132, 255, 0.86);
 
             &:hover {
-              background: var(--mainColorLight);
+              background: rgba(124, 132, 255, 0.08);
+              border-color: rgba(124, 132, 255, 0.22);
             }
           }
 
           &.magic {
-            color: #f59e0b;
+            color: rgba(245, 158, 11, 0.86);
 
             &:hover {
-              background: #fffbeb;
+              background: rgba(245, 158, 11, 0.1);
+              border-color: rgba(245, 158, 11, 0.22);
             }
           }
 
           &.delete {
-            color: #ef4444;
+            color: rgba(239, 68, 68, 0.82);
 
             &:hover {
-              background: #fef2f2;
+              background: rgba(239, 68, 68, 0.1);
+              border-color: rgba(239, 68, 68, 0.22);
             }
           }
         }
@@ -875,34 +907,113 @@ watch(batchShow, (val) => {
 }
 
 // vxe-table 自定义样式
-:deep(.vxe-table) {
+:deep(.assets-table.vxe-table) {
+  background: transparent;
+
+  .vxe-table--render-wrapper,
+  .vxe-table--main-wrapper,
+  .vxe-table--header-wrapper,
+  .vxe-table--body-wrapper,
+  .vxe-table--fixed-left-wrapper,
+  .vxe-table--fixed-right-wrapper {
+    background: transparent !important;
+  }
+
   .vxe-header--column {
-    background: #f9fafb !important;
+    background: #141821 !important;
     font-weight: 600;
-    color: #374151;
+    color: var(--tf-text-primary);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .vxe-body--column,
+  .vxe-footer--column {
+    background: #101318 !important;
+    color: var(--tf-text-secondary) !important;
   }
 
   .vxe-body--row {
-    &:hover {
-      background: var(--mainColorLight) !important;
-    }
+    background: transparent !important;
+  }
 
-    &.row--stripe {
-      background: #fafafa;
-    }
+  .vxe-body--row.row--stripe .vxe-body--column {
+    background: #12161d !important;
+  }
+
+  .vxe-body--row:hover .vxe-body--column,
+  .vxe-body--row.row--hover .vxe-body--column {
+    background: rgba(124, 132, 255, 0.06) !important;
+  }
+
+  .vxe-table--body-wrapper {
+    background: #101318 !important;
+  }
+
+  .vxe-table--header-wrapper {
+    background: #141821 !important;
   }
 
   .vxe-checkbox--icon,
   .vxe-radio--icon {
-    color: var(--mainColor);
+    color: var(--tf-accent);
   }
 
   .vxe-cell--checkbox,
   .vxe-cell--radio {
     .vxe-checkbox--checked-icon,
     .vxe-radio--checked-icon {
-      color: var(--mainColor);
+      color: var(--tf-accent);
     }
   }
+
+  .vxe-header--column,
+  .vxe-body--column,
+  .vxe-footer--column {
+    border-color: var(--tf-border-subtle) !important;
+  }
+
+  .vxe-table--border-line,
+  .vxe-table--header-border-line,
+  .vxe-table--body-border-line {
+    border-color: var(--tf-border-subtle) !important;
+  }
+
+  .col--fixed,
+  .col--last {
+    background-clip: padding-box;
+  }
+
+  .vxe-cell {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .vxe-header--column .vxe-cell {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tf-text-tertiary);
+  }
+}
+
+:deep(.prompt-textarea .ant-input),
+:deep(.prompt-textarea.ant-input) {
+  border-radius: 10px;
+  border-color: var(--tf-border-strong);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--tf-text-primary);
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  &:focus {
+    border-color: rgba(124, 132, 255, 0.42);
+    box-shadow: 0 0 0 3px rgba(124, 132, 255, 0.12);
+  }
+}
+
+:deep(.prompt-textarea .ant-input::placeholder) {
+  color: var(--tf-text-tertiary);
 }
 </style>

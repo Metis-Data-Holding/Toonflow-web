@@ -43,15 +43,13 @@ const router = createRouter({
     },
   ],
 });
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
+  const hasToken = Boolean(localStorage.getItem("token"));
+
   if (to.path === "/login") {
-    next();
-  } else {
-    if (localStorage.getItem("token")) {
-      next();
-    } else {
-      next("/login");
-    }
+    return hasToken ? "/project" : true;
   }
+
+  return hasToken ? true : "/login";
 });
 export default router;

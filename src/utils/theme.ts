@@ -8,8 +8,8 @@ interface ThemeSetting {
 
 // 使用 VueUse 的 useStorage 进行本地存储缓存
 export const themeSetting = useStorage<ThemeSetting>("theme-setting", {
-  mode: "light",
-  primaryColor: "#9810fa",
+  mode: "dark",
+  primaryColor: "#7c84ff",
 });
 
 // HEX 转 HSL
@@ -69,6 +69,26 @@ const generateColorPalette = (hex: string) => {
   return lightLevels.map((level) => hslToHex(h, s, level));
 };
 
+const withAlpha = (hex: string, alpha: string) => {
+  const value = hex.replace("#", "");
+  if (value.length !== 6) return hex;
+  const r = parseInt(value.slice(0, 2), 16);
+  const g = parseInt(value.slice(2, 4), 16);
+  const b = parseInt(value.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+const normalizeLegacyThemeSetting = () => {
+  const isLegacyDefault = themeSetting.value.primaryColor.toLowerCase() === "#9810fa" && themeSetting.value.mode === "light";
+
+  if (isLegacyDefault) {
+    themeSetting.value = {
+      mode: "dark",
+      primaryColor: "#7c84ff",
+    };
+  }
+};
+
 // 应用主题模式
 export const applyThemeMode = (mode: string) => {
   const targetMode = mode === "auto" ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : mode;
@@ -104,6 +124,25 @@ export const applyThemeColor = (color: string) => {
 
   root.style.setProperty("--td-text-color-brand", `var(--td-brand-color-${isDark ? 8 : 7})`);
   root.style.setProperty("--td-text-color-link", "var(--td-brand-color-8)");
+  root.style.setProperty("--tf-accent", color);
+  root.style.setProperty("--tf-accent-hover", isDark ? colors[7] : colors[4]);
+  root.style.setProperty("--tf-accent-soft", withAlpha(color, isDark ? "0.18" : "0.14"));
+  root.style.setProperty("--tf-accent-softer", withAlpha(color, isDark ? "0.1" : "0.08"));
+  root.style.setProperty("--mainColor", color);
+  root.style.setProperty("--mainColorHover", isDark ? colors[7] : colors[4]);
+  root.style.setProperty("--mainColorActive", isDark ? colors[6] : colors[7]);
+  root.style.setProperty("--mainColorLight", withAlpha(color, isDark ? "0.18" : "0.12"));
+  root.style.setProperty("--mainColorDark", isDark ? colors[8] : colors[7]);
+  root.style.setProperty("--hoverMainColor", withAlpha(color, isDark ? "0.16" : "0.1"));
+  root.style.setProperty("--mainGradient", `linear-gradient(180deg, ${color} 0%, ${color} 100%)`);
+  root.style.setProperty(
+    "--mainGradientHover",
+    `linear-gradient(180deg, ${isDark ? colors[7] : colors[4]} 0%, ${isDark ? colors[7] : colors[4]} 100%)`,
+  );
+  root.style.setProperty(
+    "--mainGradientLight",
+    `linear-gradient(180deg, ${withAlpha(color, isDark ? "0.18" : "0.12")} 0%, ${withAlpha(color, isDark ? "0.1" : "0.08")} 100%)`,
+  );
 };
 
 // 使用 View Transition API 进行平滑过渡
@@ -127,6 +166,8 @@ export const toggleThemeWithTransition = (event: MouseEvent | undefined, callbac
 
 // 初始化主题（在 App.vue 中调用）
 export const initTheme = () => {
+  normalizeLegacyThemeSetting();
+
   // 应用缓存的主题设置
   applyThemeMode(themeSetting.value.mode);
   applyThemeColor(themeSetting.value.primaryColor);

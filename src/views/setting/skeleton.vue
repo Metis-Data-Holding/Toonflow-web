@@ -1,13 +1,13 @@
 <template>
-  <div class="skeleton">
+  <section class="skeleton tf-panel">
     <div class="titleBox">
       <span class="title">{{ props.title }}</span>
+      <p v-if="props.description" class="description">{{ props.description }}</p>
     </div>
     <div class="box">
       <slot></slot>
     </div>
-  </div>
-  <t-divider v-if="props.divider"></t-divider>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -15,6 +15,10 @@ const props = defineProps({
   title: {
     type: String,
     required: true,
+  },
+  description: {
+    type: String,
+    default: "",
   },
   divider: {
     type: Boolean,
@@ -26,16 +30,35 @@ const props = defineProps({
 <style lang="scss" scoped>
 .skeleton {
   width: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+
   .titleBox {
-    width: 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
     .title {
-      font-weight: 600;
-      font-size: 1rem;
+      font: var(--tf-font-section-title);
+      color: var(--tf-text-primary);
+    }
+
+    .description {
+      margin: 0;
+      font: var(--tf-font-caption);
+      color: var(--tf-text-secondary);
     }
   }
+
   .box {
-    width: 90%;
+    min-width: 0;
+  }
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 </style>

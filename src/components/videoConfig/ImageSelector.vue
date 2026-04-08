@@ -6,6 +6,7 @@
     @cancel="handleCancel"
     top="1vh"
     width="80%"
+    class="image-selector-dialog"
     :bodyStyle="{ maxHeight: '70vh', overflow: 'auto' }">
     <mainElement
       v-if="visible"
@@ -17,9 +18,9 @@
     <template #footer>
       <div class="selector-footer">
         <span class="selected-count">已选择 {{ tempSelectedImages.length }} 张</span>
-        <div>
+        <div class="footer-actions">
           <t-button @click="handleCancel">取消</t-button>
-          <t-button @click="confirmSelection">确定</t-button>
+          <t-button theme="primary" @click="confirmSelection">确定</t-button>
         </div>
       </div>
     </template>
@@ -173,10 +174,36 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 
   .selected-count {
-    color: #1890ff;
+    color: var(--tf-text-secondary);
     font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--tf-border-subtle);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+:global(.image-selector-dialog) {
+  .t-dialog__header {
+    border-bottom: 1px solid var(--tf-border-subtle);
+    background: var(--tf-surface-float);
+  }
+
+  .t-dialog__body {
+    background: var(--tf-surface-panel);
+  }
+
+  .t-dialog__footer {
+    border-top: 1px solid var(--tf-border-subtle);
+    background: var(--tf-surface-float);
   }
 }
 </style>

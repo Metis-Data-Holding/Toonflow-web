@@ -35,8 +35,7 @@
 <script setup lang="ts">
 import logo from "@/assets/logo.svg";
 import { computed, reactive } from "vue";
-import { UserOutlined, DownOutlined } from "@ant-design/icons-vue";
-const theme = ref("light");
+const theme = ref("dark");
 
 const props = defineProps<{
   msg: ChatMessage;
@@ -68,7 +67,11 @@ interface ParsedMessageItem {
   content?: string;
   text?: string;
   image_url?: { url: string };
-  button?: { text: string; type?: "primary" | "ghost" | "dashed" | "link" | "text" | "default"; fn?: Function }[];
+  button?: {
+    text: string;
+    type?: "primary" | "ghost" | "dashed" | "link" | "text" | "default";
+    fn?: () => void | Promise<void>;
+  }[];
   confirm?: boolean;
 }
 
@@ -105,11 +108,15 @@ function handleClick(
   sub: {
     text: string;
     type?: "primary" | "ghost" | "dashed" | "link" | "text" | "default";
-    fn?: Function;
+    fn?: () => void | Promise<void>;
   },
   item: AssistantMessageTextWithConfirm,
 ) {
-  sub.fn ? sub.fn() : props.sendApi(sub.text);
+  if (sub.fn) {
+    sub.fn();
+  } else {
+    props.sendApi(sub.text);
+  }
   item.confirm = true;
 }
 </script>
@@ -122,10 +129,11 @@ function handleClick(
 
   .notice-text {
     padding: 6px 16px;
-    background: rgba(0, 0, 0, 0.04);
-    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--tf-border-subtle);
+    border-radius: 999px;
     font-size: 12px;
-    color: #888;
+    color: var(--tf-text-secondary);
   }
 }
 
@@ -133,7 +141,7 @@ function handleClick(
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  max-width: 85%;
+  max-width: min(92%, 860px);
 
   &.user {
     flex-direction: row-reverse;
@@ -149,7 +157,7 @@ function handleClick(
   flex-shrink: 0;
 
   .ai-avatar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--tf-accent);
 
     .avatar-text {
       font-size: 14px;
@@ -158,7 +166,7 @@ function handleClick(
   }
 
   .user-avatar {
-    background: var(--mainGradient);
+    background: var(--tf-surface-float);
   }
 }
 
@@ -172,24 +180,25 @@ function handleClick(
 .message-bubble {
   position: relative;
   padding: 12px 16px;
-  border-radius: 18px;
+  border-radius: 14px;
   word-break: break-word;
   line-height: 1.6;
   font-size: 14px;
 
   &.assistant-bubble {
-    background: #fff;
-    color: #1a1a1a;
-    border: 1px solid #eee;
-    border-bottom-left-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    background: var(--tf-surface-raised);
+    color: var(--tf-text-primary);
+    border: 1px solid var(--tf-border-strong);
+    border-bottom-left-radius: 8px;
+    box-shadow: var(--tf-shadow-soft);
   }
 
   &.user-bubble {
-    background: var(--mainGradient);
+    background: rgba(124, 132, 255, 0.16);
     color: #fff;
-    border-bottom-right-radius: 6px;
-    box-shadow: 0 2px 8px rgba(152, 16, 250, 0.25);
+    border: 1px solid rgba(124, 132, 255, 0.32);
+    border-bottom-right-radius: 8px;
+    box-shadow: none;
   }
 }
 
@@ -234,19 +243,19 @@ function handleClick(
       border-radius: 50%;
 
       &.success {
-        background: rgba(82, 196, 26, 0.1);
-        color: #52c41a;
+        background: rgba(34, 197, 94, 0.12);
+        color: var(--tf-success);
       }
 
       &.error {
-        background: rgba(255, 77, 79, 0.1);
-        color: #ff4d4f;
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--tf-danger);
       }
     }
 
     .result-text {
       font-size: 12px;
-      color: #888;
+      color: var(--tf-text-secondary);
     }
   }
 }
@@ -260,7 +269,7 @@ function handleClick(
   .thinking-dot {
     width: 8px;
     height: 8px;
-    background: #bbb;
+    background: var(--tf-accent);
     border-radius: 50%;
     animation: bounce 1.4s infinite ease-in-out both;
 
@@ -308,8 +317,8 @@ function handleClick(
 
 // 思考过程折叠块样式
 .thinking-block {
-  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
-  border: 1px solid #e8ecf4;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--tf-border-subtle);
   border-radius: 12px;
   overflow: hidden;
 
@@ -319,10 +328,10 @@ function handleClick(
     gap: 8px;
     padding: 10px 14px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.18s ease;
 
     &:hover {
-      background: rgba(102, 126, 234, 0.06);
+      background: rgba(124, 132, 255, 0.08);
     }
 
     .thinking-icon {
@@ -333,7 +342,7 @@ function handleClick(
       flex: 1;
       font-size: 13px;
       font-weight: 500;
-      color: #667eea;
+      color: var(--tf-text-primary);
     }
 
     .thinking-toggle {
@@ -342,7 +351,7 @@ function handleClick(
       justify-content: center;
       width: 20px;
       height: 20px;
-      color: #667eea;
+      color: var(--tf-text-secondary);
       transition: transform 0.3s ease;
 
       &.collapsed {
@@ -352,14 +361,14 @@ function handleClick(
   }
 
   .thinking-block-content {
-    border-top: 1px solid #e8ecf4;
-    background: rgba(255, 255, 255, 0.6);
+    border-top: 1px solid var(--tf-border-subtle);
+    background: rgba(255, 255, 255, 0.02);
 
     .thinking-text {
       padding: 12px 14px;
       font-size: 13px;
       line-height: 1.8;
-      color: #5a6078;
+      color: var(--tf-text-secondary);
       white-space: pre-wrap;
       max-height: 300px;
       overflow-y: auto;
@@ -374,11 +383,60 @@ function handleClick(
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #d0d5e0;
+        background: rgba(255, 255, 255, 0.18);
         border-radius: 2px;
       }
     }
   }
+}
+
+:deep(.mc-bubble) {
+  gap: 8px;
+}
+
+:deep(.mc-bubble .mc-bubble-avatar-name) {
+  color: var(--tf-text-secondary);
+}
+
+:deep(.mc-bubble .mc-bubble-content.bordered) {
+  background: var(--tf-surface-raised);
+  border-color: var(--tf-border-strong);
+  border-radius: 14px;
+  box-shadow: var(--tf-shadow-soft);
+}
+
+:deep(.mc-bubble.mc-bubble-right .mc-bubble-content.bordered) {
+  background: rgba(124, 132, 255, 0.14);
+  border-color: rgba(124, 132, 255, 0.28);
+  box-shadow: none;
+}
+
+:deep(.mc-bubble .mc-bubble-avatar-style) {
+  border-radius: 12px;
+}
+
+:deep(.mc-markdown-render.mc-markdown-render-dark) {
+  color: var(--tf-text-primary);
+}
+
+:deep(.mc-markdown-render.mc-markdown-render-dark blockquote) {
+  color: var(--tf-text-secondary);
+  border-left-color: var(--tf-border-strong);
+}
+
+:deep(.mc-markdown-render.mc-markdown-render-dark td),
+:deep(.mc-markdown-render.mc-markdown-render-dark th) {
+  border-color: var(--tf-border-subtle);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+:deep(.mc-markdown-render.mc-markdown-render-dark th) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:deep(.mc-code-block-dark) {
+  border-color: var(--tf-border-strong);
+  background: #171b23;
 }
 :deep(.hljs) {
   text-wrap: wrap;

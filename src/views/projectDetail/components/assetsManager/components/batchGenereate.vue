@@ -8,7 +8,7 @@
             <i-magic-wand theme="filled" size="20" />
           </div>
           <span class="header-title">批量生成</span>
-          <a-tag color="purple">{{ localData?.length || 0 }} 项</a-tag>
+          <a-tag class="count-tag">{{ localData?.length || 0 }} 项</a-tag>
         </div>
         <button class="close-btn" @click="handleCancel">
           <i-close theme="outline" size="18" />
@@ -278,8 +278,8 @@ async function generatePrompt(data: GenerateItem) {
     if (index !== -1 && !promptGenerateCancel.value) {
       localData.value![index].prompt = res.data.prompt;
     }
-  } catch (e: any) {
-    message.error(`"${data.name}" ${e?.message ?? "提示词生成失败"}`);
+  } catch (e: unknown) {
+    message.error(`"${data.name}" ${e instanceof Error ? e.message : "提示词生成失败"}`);
   } finally {
     rowPromptLoading.value[data.id] = false;
   }
@@ -333,8 +333,8 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
     if (index !== -1) {
       localData.value[index].filePath = res.data.path;
     }
-  } catch (e: any) {
-    message.error(`"${data.name}" 图片生成失败: ${e?.message ?? "未知错误"}`);
+  } catch (e: unknown) {
+    message.error(`"${data.name}" 图片生成失败: ${e instanceof Error ? e.message : "未知错误"}`);
   } finally {
     rowImageLoading.value[data.id] = false;
   }
@@ -347,8 +347,8 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-  border-bottom: 1px solid #e9d5ff;
+  background: var(--tf-bg-panel);
+  border-bottom: 1px solid var(--tf-border-subtle);
   margin: -20px -24px 0;
   border-radius: 8px 8px 0 0;
 
@@ -364,15 +364,21 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
     justify-content: center;
     width: 36px;
     height: 36px;
-    background: var(--mainGradient);
+    background: var(--tf-accent-soft);
     border-radius: 10px;
-    color: #fff;
+    color: var(--tf-accent-hover);
   }
 
   .header-title {
     font-size: 18px;
     font-weight: 600;
-    color: #1a1a1a;
+    color: var(--tf-text-primary);
+  }
+
+  .count-tag {
+    color: var(--tf-text-secondary);
+    background: var(--tf-bg-panel-2);
+    border-color: var(--tf-border-subtle);
   }
 
   .close-btn {
@@ -381,15 +387,16 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
     justify-content: center;
     width: 32px;
     height: 32px;
-    border: none;
-    border-radius: 8px;
+    border: 1px solid transparent;
+    border-radius: 10px;
     background: transparent;
-    color: #666;
+    color: var(--tf-text-secondary);
     cursor: pointer;
 
     &:hover {
-      background: #fff;
-      color: var(--mainColor);
+      background: var(--tf-bg-panel-2);
+      border-color: var(--tf-border-subtle);
+      color: var(--tf-text-primary);
     }
   }
 }
@@ -397,6 +404,7 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
 .modal-content {
   margin: 0 -24px;
   padding: 0 24px;
+  background: var(--tf-bg-panel);
   max-height: 65vh;
   overflow: hidden;
   display: flex;
@@ -408,7 +416,7 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
   align-items: center;
   justify-content: space-between;
   padding: 16px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--tf-border-subtle);
   flex-shrink: 0;
 
   .toolbar-left {
@@ -418,10 +426,10 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
 
     .select-info {
       font-size: 13px;
-      color: #888;
+      color: var(--tf-text-secondary);
 
       strong {
-        color: var(--mainColor);
+        color: var(--tf-text-primary);
         font-weight: 600;
       }
     }
@@ -438,20 +446,21 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
-  border: 1px solid #eee;
+  border-radius: 12px;
+  border: 1px solid var(--tf-border-subtle);
   margin-top: 16px;
+  background: var(--tf-bg-panel);
 }
 
 .table-header {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  background: #fafafa;
-  border-bottom: 1px solid #eee;
+  background: var(--tf-bg-panel-2);
+  border-bottom: 1px solid var(--tf-border-subtle);
   font-weight: 600;
   font-size: 13px;
-  color: #666;
+  color: var(--tf-text-primary);
   flex-shrink: 0;
 }
 
@@ -464,7 +473,7 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #ddd;
+    background: rgba(255, 255, 255, 0.16);
     border-radius: 3px;
   }
 }
@@ -473,18 +482,18 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
   display: flex;
   align-items: stretch;
   padding: 16px;
-  border-bottom: 1px solid #f5f5f5;
-  background: #fff;
+  border-bottom: 1px solid var(--tf-border-subtle);
+  background: var(--tf-bg-panel);
   box-sizing: border-box;
   border-left: 3px solid transparent;
 
   &:hover {
-    background: #fafafa;
+    background: rgba(124, 132, 255, 0.04);
   }
 
   &.selected {
-    background: #faf5ff;
-    border-left-color: var(--mainColor);
+    background: var(--tf-accent-softer);
+    border-left-color: var(--tf-accent);
   }
 
   &:last-child {
@@ -560,17 +569,17 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
 .img-wrapper {
   width: 80px;
   height: 80px;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px dashed #d9d9d9;
-  background: #fafafa;
+  border: 1px dashed var(--tf-border-strong);
+  background: var(--tf-bg-panel-2);
   display: flex;
   align-items: center;
   justify-content: center;
 
   &.has-image {
     border-style: solid;
-    border-color: #e9d5ff;
+    border-color: rgba(124, 132, 255, 0.24);
   }
 
   :deep(.ant-image) {
@@ -590,18 +599,18 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
     align-items: center;
     justify-content: center;
     gap: 4px;
-    color: #bbb;
+    color: var(--tf-text-muted);
     font-size: 12px;
   }
 }
 
 .input-field {
   width: 100%;
-  border-radius: 6px !important;
+  border-radius: 12px !important;
 
   &:focus {
-    border-color: var(--mainColor) !important;
-    box-shadow: 0 0 0 2px rgba(152, 16, 250, 0.1) !important;
+    border-color: var(--tf-accent) !important;
+    box-shadow: 0 0 0 3px var(--tf-accent-softer) !important;
   }
 }
 
@@ -619,7 +628,7 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
   align-items: center;
   justify-content: center;
   padding: 60px 0;
-  color: #bbb;
+  color: var(--tf-text-muted);
 
   p {
     margin-top: 12px;
@@ -639,19 +648,25 @@ async function startGenerate(data: { id: number; prompt: string; name: string; t
 .batch-generate-modal .ant-modal-content {
   border-radius: 12px;
   overflow: hidden;
+  background: var(--tf-bg-panel);
+  border: 1px solid var(--tf-border-subtle);
+  box-shadow: var(--tf-shadow-2);
 }
 
 .batch-generate-modal .ant-modal-header {
   padding: 0;
   border: none;
+  background: var(--tf-bg-panel);
 }
 
 .batch-generate-modal .ant-modal-body {
   padding: 20px 24px;
+  background: var(--tf-bg-panel);
 }
 
 .batch-generate-modal .ant-modal-footer {
-  border: none;
+  border-top: 1px solid var(--tf-border-subtle);
   padding: 0 24px 20px;
+  background: var(--tf-bg-panel);
 }
 </style>

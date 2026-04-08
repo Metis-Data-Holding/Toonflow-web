@@ -75,7 +75,7 @@
                 </div>
                 <t-button variant="text" size="small" class="toggle-btn" @click.stop="setVisible(row.id, !visibleMap[row.id])">
                   <i-preview-open v-if="!visibleMap[row.id]" theme="outline" size="18" fill="#8c8c8c" />
-                  <i-preview-close v-else theme="outline" size="18" fill="#0052d9" />
+                  <i-preview-close v-else theme="outline" size="18" fill="#7c84ff" />
                 </t-button>
               </div>
             </template>
@@ -213,6 +213,7 @@
 import { ref, computed, reactive, watch } from "vue";
 import dayjs from "dayjs";
 import { MessagePlugin } from "tdesign-vue-next";
+import type { RowEventContext, TableRowData } from "tdesign-vue-next";
 import axios from "@/utils/axios";
 import modeListDialog from "./modeListDialog.vue";
 import addModelDialog from "./addModelDialog.vue";
@@ -365,9 +366,10 @@ function handleRadioChange(row: RowData) {
 }
 
 // 处理行点击
-function handleRowClick({ row }: { row: RowData }) {
-  if (row.type === props.currentType) {
-    selectedRowId.value = row.id;
+function handleRowClick({ row }: RowEventContext<TableRowData>) {
+  const currentRow = row as RowData;
+  if (currentRow.type === props.currentType) {
+    selectedRowId.value = currentRow.id;
   }
 }
 
@@ -618,8 +620,19 @@ async function confirmConfig() {
 <style lang="scss" scoped>
 .modelData {
   :deep(.model-data-modal) {
+    .t-dialog__header {
+      border-bottom: 1px solid var(--tf-border-subtle);
+      background: var(--tf-surface-float);
+    }
+
     .t-dialog__body {
       padding: 24px;
+      background: var(--tf-surface-panel);
+    }
+
+    .t-dialog__footer {
+      border-top: 1px solid var(--tf-border-subtle);
+      background: var(--tf-surface-float);
     }
   }
 }
@@ -627,7 +640,7 @@ async function confirmConfig() {
 .data-container {
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: var(--tf-surface-panel);
 }
 
 .toolbar {
@@ -643,13 +656,15 @@ async function confirmConfig() {
       padding: 0 24px;
       font-size: 14px;
       font-weight: 500;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 82, 217, 0.2);
-      transition: all 0.3s ease;
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(124, 132, 255, 0.18);
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 82, 217, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 14px 28px rgba(124, 132, 255, 0.22);
       }
 
       svg {
@@ -666,21 +681,24 @@ async function confirmConfig() {
     .search-input {
       width: 100%;
       height: 40px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
+      border-radius: 12px;
 
       :deep(.t-input) {
         font-size: 14px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-        transition: all 0.3s ease;
+        border-radius: 12px;
+        background: var(--tf-surface-raised);
+        border-color: var(--tf-border-strong);
+        transition:
+          border-color 0.18s ease,
+          box-shadow 0.18s ease;
 
         &:hover {
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          border-color: rgba(255, 255, 255, 0.16);
         }
 
         &:focus {
-          box-shadow: 0 2px 8px rgba(0, 82, 217, 0.2);
+          border-color: rgba(124, 132, 255, 0.42);
+          box-shadow: 0 0 0 3px rgba(124, 132, 255, 0.14);
         }
       }
     }
@@ -689,23 +707,28 @@ async function confirmConfig() {
   .toolbar-right {
     .model-count {
       padding: 8px 16px;
-      border-radius: 20px;
+      border-radius: 999px;
       font-size: 14px;
       font-weight: 500;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--tf-border-subtle);
+      color: var(--tf-text-secondary);
     }
   }
 }
 
 .table-wrapper {
   margin-bottom: 20px;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
+  border: 1px solid var(--tf-border-subtle);
+  background: var(--tf-surface-raised);
 
   :deep(.custom-table) {
     font-size: 14px;
 
     .t-table__header {
-      background: linear-gradient(to bottom, #fafafa, #f5f5f5);
+      background: rgba(255, 255, 255, 0.03);
       font-weight: 600;
     }
 
@@ -713,25 +736,26 @@ async function confirmConfig() {
       transition: all 0.2s ease;
 
       &:hover {
-        background: #f0f7ff !important;
+        background: rgba(255, 255, 255, 0.03) !important;
       }
     }
 
     .t-table__cell {
       padding: 12px 8px;
+      border-color: var(--tf-border-subtle);
     }
   }
 
   .manufacturer-tag {
     font-weight: 500;
-    border-radius: 6px;
+    border-radius: 999px;
     padding: 4px 12px;
     border: none;
   }
 
   .type-tag {
     font-weight: 500;
-    border-radius: 6px;
+    border-radius: 999px;
     padding: 4px 12px;
     border: none;
     display: inline-flex;
@@ -770,8 +794,8 @@ async function confirmConfig() {
       transition: all 0.2s ease;
 
       &:hover {
-        background: #f0f0f0;
-        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
       }
     }
   }
@@ -790,7 +814,7 @@ async function confirmConfig() {
     flex-wrap: wrap;
 
     .action-btn {
-      border-radius: 6px;
+      border-radius: 10px;
       font-weight: 500;
       transition: all 0.2s ease;
       display: inline-flex;
@@ -802,18 +826,18 @@ async function confirmConfig() {
       }
 
       &.test-btn {
-        box-shadow: 0 2px 4px rgba(0, 82, 217, 0.2);
+        box-shadow: 0 10px 24px rgba(124, 132, 255, 0.16);
 
         &:hover {
-          box-shadow: 0 4px 8px rgba(0, 82, 217, 0.3);
+          box-shadow: 0 14px 28px rgba(124, 132, 255, 0.2);
         }
       }
 
       &.edit-btn {
-        border-color: #0052d9;
+        border-color: rgba(124, 132, 255, 0.28);
 
         &:hover {
-          background: #e6f2ff;
+          background: rgba(124, 132, 255, 0.08);
         }
       }
 
@@ -837,13 +861,15 @@ async function confirmConfig() {
     padding: 0 32px;
     font-size: 14px;
     font-weight: 500;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 82, 217, 0.2);
-    transition: all 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(124, 132, 255, 0.18);
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 82, 217, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(124, 132, 255, 0.22);
     }
 
     svg {
@@ -863,9 +889,9 @@ async function confirmConfig() {
   .test-result-tip {
     margin-bottom: 20px;
     padding: 12px 16px;
-    background: #f6ffed;
-    border-left: 4px solid #52c41a;
-    border-radius: 4px;
+    background: rgba(34, 197, 94, 0.1);
+    border-left: 4px solid var(--tf-success);
+    border-radius: 10px;
     font-size: 14px;
     line-height: 1.6;
   }
@@ -875,9 +901,9 @@ async function confirmConfig() {
     display: flex;
     justify-content: center;
     padding: 16px;
-    background: #fafafa;
-    border-radius: 8px;
-    border: 2px dashed #d9d9d9;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px dashed var(--tf-border-strong);
   }
 
   .test-image-preview {

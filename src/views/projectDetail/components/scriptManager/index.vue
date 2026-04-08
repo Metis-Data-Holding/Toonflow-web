@@ -156,38 +156,52 @@ onMounted(getScriptData);
 
 <style lang="scss" scoped>
 .scriptManager {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
   .smHead {
+    padding: 20px 24px;
+    border: 1px solid var(--tf-border-strong);
+    border-radius: 16px;
+    background: var(--tf-surface-panel);
+    box-shadow: var(--tf-shadow-soft);
+
     .smTitle {
       font-size: 22px;
       font-weight: 600;
       margin-bottom: 8px;
+      color: var(--tf-text-primary);
     }
 
     .smSub {
-      color: #a19f9f;
+      color: var(--tf-text-secondary);
       font-size: 15px;
+      margin: 0;
     }
   }
 
   .data {
     display: flex;
     flex-direction: column;
+    gap: 20px;
 
     .newStoryboard {
-      margin-bottom: 1rem;
       .noneScripts {
         height: 400px;
         text-align: center;
         padding: 4rem 0;
-        background: #fff;
-        border-radius: 0.75rem;
-        border: 1px solid #e5e7eb;
-        margin: 0 auto 1rem;
+        background: var(--tf-surface-panel);
+        border-radius: 16px;
+        border: 1px solid var(--tf-border-strong);
+        box-shadow: var(--tf-shadow-soft);
+        margin: 0 auto;
 
         .smNoneIcon {
           width: 6rem;
           height: 6rem;
-          background: #f3f4f6;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid var(--tf-border-subtle);
           border-radius: 9999px;
           display: flex;
           align-items: center;
@@ -195,14 +209,14 @@ onMounted(getScriptData);
           margin: 0 auto 1rem;
 
           .icon {
-            color: #d1d5db;
+            color: var(--tf-text-tertiary);
           }
         }
 
         .smNoneTitle {
           font-size: 17px;
           font-weight: 500;
-          color: #18181b;
+          color: var(--tf-text-primary);
           margin-bottom: 8px;
         }
       }

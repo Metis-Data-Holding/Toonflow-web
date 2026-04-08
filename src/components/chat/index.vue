@@ -176,18 +176,21 @@ defineExpose({ scrollBottom, smartScrollBottom });
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  gap: 12px;
+  padding: 0;
+  min-height: 0;
 }
 
 .message-area {
   flex: 1;
+  min-height: 0;
   border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--tf-border-strong);
+  background: var(--tf-surface-panel);
+  box-shadow: var(--tf-shadow-soft);
 
   :deep(.el-scrollbar__wrap) {
-    padding: 20px;
+    padding: 18px;
   }
 }
 
@@ -198,7 +201,7 @@ defineExpose({ scrollBottom, smartScrollBottom });
 }
 
 .message-item {
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.24s ease;
 }
 
 @keyframes fadeIn {
@@ -224,21 +227,24 @@ defineExpose({ scrollBottom, smartScrollBottom });
 }
 
 .input-container {
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 2px solid transparent;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--tf-surface-raised);
+  border-radius: 16px;
+  box-shadow: var(--tf-shadow-soft);
+  border: 1px solid var(--tf-border-strong);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
   overflow: hidden;
 
   &:focus-within {
-    border-color: var(--mainColor);
-    box-shadow: 0 4px 24px rgba(152, 16, 250, 0.15);
+    border-color: rgba(124, 132, 255, 0.42);
+    box-shadow: 0 0 0 3px rgba(124, 132, 255, 0.14);
   }
 }
 
 .input-wrapper {
-  padding: 16px 16px 8px;
+  padding: 14px 16px 10px;
 
   .message-input {
     width: 100%;
@@ -249,16 +255,17 @@ defineExpose({ scrollBottom, smartScrollBottom });
     resize: none;
     font-size: 15px;
     line-height: 1.6;
-    color: #1a1a1a;
+    color: var(--tf-text-primary);
     background: transparent;
     font-family: inherit;
 
     &::placeholder {
-      color: #bbb;
+      color: var(--tf-text-tertiary);
     }
 
     // 覆盖 ant-design mentions 样式
     :deep(.ant-mentions) {
+      background: transparent !important;
       border: none !important;
       box-shadow: none !important;
 
@@ -267,6 +274,11 @@ defineExpose({ scrollBottom, smartScrollBottom });
         border: none !important;
         box-shadow: none !important;
       }
+    }
+
+    :deep(.ant-mentions textarea) {
+      color: var(--tf-text-primary) !important;
+      background: transparent !important;
     }
   }
 }
@@ -289,21 +301,25 @@ defineExpose({ scrollBottom, smartScrollBottom });
   justify-content: center;
   width: 36px;
   height: 36px;
-  border: none;
+  border: 1px solid var(--tf-border-strong);
   border-radius: 10px;
-  background: #f5f5f5;
-  color: #666;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--tf-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
 
   &:hover {
-    background: #eee;
-    color: #333;
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--tf-text-primary);
   }
 
   &.danger:hover {
-    background: #fff1f0;
-    color: #ff4d4f;
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.24);
+    color: var(--tf-danger);
   }
 }
 
@@ -314,25 +330,29 @@ defineExpose({ scrollBottom, smartScrollBottom });
   width: 44px;
   height: 44px;
   border: none;
-  border-radius: 14px;
-  background: var(--mainGradient);
+  border-radius: 12px;
+  background: var(--tf-accent);
   color: #fff;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(152, 16, 250, 0.3);
+  transition:
+    background-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+  box-shadow: 0 10px 24px rgba(124, 132, 255, 0.18);
 
   &:hover:not(.disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(152, 16, 250, 0.4);
+    background: var(--tf-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(124, 132, 255, 0.22);
   }
 
   &:active:not(.disabled) {
-    transform: scale(0.95);
+    transform: translateY(0);
   }
 
   &.disabled {
-    background: #e0e0e0;
-    color: #999;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--tf-text-tertiary);
     cursor: not-allowed;
     box-shadow: none;
   }

@@ -1,5 +1,8 @@
 <template>
   <div class="dbConfig">
+    <div class="intro">
+      <p>以下操作具有破坏性，只适用于明确的数据维护场景。</p>
+    </div>
     <t-card class="actionItem">
       <div class="actionInfo">
         <h4>清空数据库</h4>
@@ -143,7 +146,15 @@ function handleCancel() {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px;
+  padding: 4px 0;
+
+  .intro {
+    p {
+      margin: 0;
+      color: var(--tf-text-secondary);
+      font: var(--tf-font-caption);
+    }
+  }
 }
 
 .actionItem {
@@ -151,18 +162,22 @@ function handleCancel() {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
   }
 
   .actionInfo {
     h4 {
       margin: 0 0 4px;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--tf-text-primary);
     }
 
     p {
       margin: 0;
-      font-size: 12px;
+      font-size: 13px;
+      color: var(--tf-text-secondary);
     }
   }
 }
@@ -178,6 +193,7 @@ function handleCancel() {
   p {
     margin: 0;
     font-size: 14px;
+    color: var(--tf-text-secondary);
   }
 
   .confirmInput {

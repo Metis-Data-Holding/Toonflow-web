@@ -12,6 +12,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { theme as antTheme } from "ant-design-vue";
 import zhCN from "ant-design-vue/es/locale/zh_CN";
 import UpdateDialog from "@/components/update.vue";
 import { initTheme } from "@/utils/theme";
@@ -42,8 +43,50 @@ onMounted(() => {
 });
 
 const theme = {
+  algorithm: antTheme.darkAlgorithm,
   token: {
-    colorPrimary: "#9810fa",
+    colorPrimary: "#7c84ff",
+    colorBgBase: "#0b0d10",
+    colorBgLayout: "#0b0d10",
+    colorBgContainer: "#111318",
+    colorBgElevated: "#1c212b",
+    colorFillSecondary: "#171a21",
+    colorFillTertiary: "#1c212b",
+    colorBorder: "rgba(255,255,255,0.08)",
+    colorBorderSecondary: "rgba(255,255,255,0.12)",
+    colorText: "#f3f5f7",
+    colorTextSecondary: "#a7b0be",
+    colorTextTertiary: "#6f7785",
+    borderRadius: 12,
+    borderRadiusLG: 16,
+    controlHeight: 36,
+    controlOutline: "rgba(124,132,255,0.2)",
+    boxShadowSecondary: "0 18px 48px rgba(0, 0, 0, 0.34)",
+  },
+  components: {
+    Button: {
+      primaryShadow: "none",
+      defaultShadow: "none",
+    },
+    Card: {
+      colorBgContainer: "#111318",
+    },
+    Input: {
+      colorBgContainer: "#171a21",
+      activeBg: "#171a21",
+      hoverBg: "#171a21",
+    },
+    Modal: {
+      contentBg: "#111318",
+      headerBg: "#111318",
+      footerBg: "#111318",
+    },
+    Table: {
+      headerBg: "#171a21",
+      headerColor: "#f3f5f7",
+      rowHoverBg: "rgba(124,132,255,0.08)",
+      borderColor: "rgba(255,255,255,0.08)",
+    },
   },
 };
 
@@ -58,18 +101,4 @@ const customConfig: GlobalConfigProvider = {
   pagination: {},
 };
 const globalConfig: GlobalConfigProvider = merge(empty, zhConfig, customConfig);
-
-// document.documentElement.setAttribute('theme-mode', 'dark');
-// document.documentElement.setAttribute('theme-mode', 'light');
 </script>
-
-<style lang="scss">
-:root {
-  --mainColor: #9810fa;
-  --mainColorLight: #faf5ff;
-  --mainColorHover: #7c0dd4;
-  --mainColorActive: #6a0bb5;
-  --mainGradient: linear-gradient(135deg, #9810fa 0%, #7c3aed 100%);
-  --mainGradientHover: linear-gradient(135deg, #a020fb 0%, #8b5cf6 100%);
-}
-</style>

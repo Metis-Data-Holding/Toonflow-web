@@ -1,5 +1,8 @@
 <template>
-  <div v-loading="loading">
+  <div v-loading="loading" class="loginConfig">
+    <div class="intro">
+      <p>用于更新本地工作台登录凭证。修改后下次登录将按新账号信息校验。</p>
+    </div>
     <t-form ref="formRef" labelAlign="top" :data="formData" :rules="formRules" :colon="true" @submit="handleSubmit" @reset="handleReset">
       <t-form-item label="用户名" name="name">
         <t-input v-model="formData.name" placeholder="请输入用户名" clearable width="100%" />
@@ -7,9 +10,9 @@
       <t-form-item label="密码" name="password">
         <t-input v-model="formData.password" type="password" placeholder="请输入密码" />
       </t-form-item>
-      <t-form-item :status-icon="false">
+      <t-form-item :status-icon="false" class="actionRow">
         <t-space size="small">
-          <t-button theme="primary" type="submit" :loading="loading">修改</t-button>
+          <t-button theme="primary" type="submit" :loading="loading">保存修改</t-button>
         </t-space>
       </t-form-item>
     </t-form>
@@ -88,4 +91,23 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.loginConfig {
+  width: 100%;
+  padding: 4px 0;
+
+  .intro {
+    margin-bottom: 16px;
+
+    p {
+      margin: 0;
+      color: var(--tf-text-secondary);
+      font: var(--tf-font-caption);
+    }
+  }
+
+  .actionRow {
+    margin-top: 4px;
+  }
+}
+</style>

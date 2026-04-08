@@ -105,7 +105,7 @@
     <newVideo v-if="modalShow && scriptId" v-model="modalShow" :scriptId="scriptId" />
 
     <!-- 视频详情弹窗 -->
-    <videoDetail  v-model="detailModalShow" :configId="currentConfigId" />
+    <videoDetail v-model="detailModalShow" :configId="currentConfigId" />
   </div>
 </template>
 
@@ -191,9 +191,10 @@ function handleDeleteConfig(configId: number) {
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    background: var(--td-bg-color-container);
+    background: var(--tf-surface-panel);
     border-radius: 16px;
-    border: 1px solid var(--td-component-border);
+    border: 1px solid var(--tf-border-strong);
+    box-shadow: var(--tf-shadow-soft);
 
     .title {
       display: flex;
@@ -201,7 +202,7 @@ function handleDeleteConfig(configId: number) {
       gap: 12px;
       font-weight: 600;
       font-size: 16px;
-      color: var(--td-text-color-primary);
+      color: var(--tf-text-primary);
 
       .icon-wrapper {
         display: flex;
@@ -209,21 +210,21 @@ function handleDeleteConfig(configId: number) {
         justify-content: center;
         width: 36px;
         height: 36px;
-        background: var(--td-brand-color);
-        border-radius: 10px;
-        box-shadow: 0 4px 12px var(--td-shadow-1);
+        background: rgba(124, 132, 255, 0.14);
+        border: 1px solid rgba(124, 132, 255, 0.2);
+        border-radius: 12px;
 
         .icon {
-          color: var(--td-text-color-anti);
+          color: var(--tf-accent);
         }
       }
 
       .count {
         padding: 2px 10px;
-        background: var(--td-bg-color-component);
-        color: var(--td-brand-color);
-        border: 1px solid var(--td-component-border);
-        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--tf-text-secondary);
+        border: 1px solid var(--tf-border-subtle);
+        border-radius: 999px;
         font-size: 13px;
         font-weight: 500;
       }
@@ -234,20 +235,23 @@ function handleDeleteConfig(configId: number) {
       align-items: center;
       gap: 8px;
       padding: 10px 20px;
-      background: var(--td-brand-color);
-      color: var(--td-text-color-anti);
+      background: var(--tf-accent);
+      color: #fff;
       border: none;
       border-radius: 12px;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 14px var(--td-shadow-1);
+      transition:
+        transform 0.18s ease,
+        background-color 0.18s ease,
+        box-shadow 0.18s ease;
+      box-shadow: 0 10px 24px rgba(124, 132, 255, 0.18);
 
       &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        background: var(--td-brand-color-hover);
-        box-shadow: 0 6px 20px var(--td-shadow-2);
+        transform: translateY(-1px);
+        background: var(--tf-accent-hover);
+        box-shadow: 0 14px 28px rgba(124, 132, 255, 0.22);
       }
 
       &:active:not(:disabled) {
@@ -255,8 +259,8 @@ function handleDeleteConfig(configId: number) {
       }
 
       &:disabled {
-        background: var(--td-bg-color-component-disabled);
-        color: var(--td-text-color-disabled);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--tf-text-tertiary);
         box-shadow: none;
         cursor: not-allowed;
         opacity: 0.6;
@@ -275,18 +279,21 @@ function handleDeleteConfig(configId: number) {
 
     .video-card {
       position: relative;
-      background: var(--td-bg-color-container);
+      background: var(--tf-surface-panel);
       border-radius: 16px;
       overflow: hidden;
       cursor: pointer;
-      transition: all 0.3s ease;
-      border: 1px solid var(--td-component-border);
-      box-shadow: 0 2px 8px var(--td-shadow-1);
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
+      border: 1px solid var(--tf-border-strong);
+      box-shadow: var(--tf-shadow-soft);
 
       &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px var(--td-shadow-3);
-        border-color: var(--td-brand-color);
+        transform: translateY(-2px);
+        box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
+        border-color: rgba(124, 132, 255, 0.22);
 
         .play-overlay {
           opacity: 1;
@@ -313,9 +320,9 @@ function handleDeleteConfig(configId: number) {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--td-brand-color);
-        border-radius: 6px;
-        color: var(--td-text-color-anti);
+        background: rgba(124, 132, 255, 0.9);
+        border-radius: 8px;
+        color: #fff;
         font-size: 12px;
         font-weight: 600;
         z-index: 10;
@@ -330,18 +337,18 @@ function handleDeleteConfig(configId: number) {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--td-error-color);
+        background: rgba(239, 68, 68, 0.92);
         border: none;
-        border-radius: 8px;
-        color: var(--td-text-color-anti);
+        border-radius: 10px;
+        color: #fff;
         cursor: pointer;
         opacity: 0;
         transition: all 0.2s ease;
         z-index: 10;
 
         &:hover {
-          background: var(--td-error-color-hover);
-          transform: scale(1.1);
+          background: var(--tf-danger);
+          transform: translateY(-1px);
         }
       }
 
@@ -350,7 +357,7 @@ function handleDeleteConfig(configId: number) {
         width: 100%;
         height: 180px;
         overflow: hidden;
-        background: var(--td-bg-color-component);
+        background: rgba(255, 255, 255, 0.03);
 
         .cover-image {
           width: 100%;
@@ -366,8 +373,8 @@ function handleDeleteConfig(configId: number) {
           justify-content: center;
           height: 100%;
           gap: 8px;
-          color: var(--td-text-color-placeholder);
-          
+          color: var(--tf-text-tertiary);
+
           span {
             font-size: 14px;
           }
@@ -376,7 +383,7 @@ function handleDeleteConfig(configId: number) {
         .play-overlay {
           position: absolute;
           inset: 0;
-          background: var(--td-mask-active);
+          background: rgba(11, 13, 16, 0.48);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -386,7 +393,7 @@ function handleDeleteConfig(configId: number) {
           .play-button {
             width: 60px;
             height: 60px;
-            background: var(--td-brand-color);
+            background: rgba(124, 132, 255, 0.94);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -396,7 +403,7 @@ function handleDeleteConfig(configId: number) {
 
             &:hover {
               transform: scale(1.1);
-              background: var(--td-brand-color-hover);
+              background: var(--tf-accent-hover);
             }
           }
         }
@@ -406,9 +413,9 @@ function handleDeleteConfig(configId: number) {
           bottom: 10px;
           right: 10px;
           padding: 4px 10px;
-          background: var(--td-mask-active);
-          color: var(--td-text-color-anti);
-          border-radius: 6px;
+          background: rgba(11, 13, 16, 0.78);
+          color: var(--tf-text-primary);
+          border-radius: 8px;
           font-size: 12px;
           font-weight: 500;
           backdrop-filter: blur(4px);
@@ -419,7 +426,7 @@ function handleDeleteConfig(configId: number) {
           top: 10px;
           left: 10px;
           padding: 4px 10px;
-          border-radius: 6px;
+          border-radius: 8px;
           font-size: 12px;
           font-weight: 500;
 
@@ -441,20 +448,20 @@ function handleDeleteConfig(configId: number) {
             .loading-spinner {
               width: 40px;
               height: 40px;
-              border: 3px solid var(--td-component-border);
-              border-top-color: var(--td-brand-color);
+              border: 3px solid rgba(255, 255, 255, 0.12);
+              border-top-color: var(--tf-accent);
               border-radius: 50%;
               animation: spin 1s linear infinite;
             }
 
             .status-text {
-              color: var(--td-text-color-secondary);
+              color: var(--tf-text-secondary);
               font-size: 14px;
               font-weight: 500;
             }
 
             .status-hint {
-              color: var(--td-text-color-placeholder);
+              color: var(--tf-text-tertiary);
               font-size: 12px;
             }
           }
@@ -463,23 +470,23 @@ function handleDeleteConfig(configId: number) {
             .pending-icon {
               width: 50px;
               height: 50px;
-              background: var(--td-bg-color-component);
-              border: 1px solid var(--td-component-border);
+              background: rgba(255, 255, 255, 0.04);
+              border: 1px solid var(--tf-border-subtle);
               border-radius: 50%;
               display: flex;
               align-items: center;
               justify-content: center;
-              color: var(--td-brand-color);
+              color: var(--tf-accent);
             }
 
             .status-text {
-              color: var(--td-text-color-secondary);
+              color: var(--tf-text-secondary);
               font-size: 14px;
               font-weight: 500;
             }
 
             .status-hint {
-              color: var(--td-text-color-placeholder);
+              color: var(--tf-text-tertiary);
               font-size: 12px;
             }
           }
@@ -499,34 +506,34 @@ function handleDeleteConfig(configId: number) {
           .resolution-tag,
           .duration-tag {
             padding: 2px 8px;
-            border-radius: 4px;
+            border-radius: 999px;
             font-size: 12px;
             font-weight: 500;
           }
 
           .manufacturer-tag {
-            background: var(--td-brand-color-1);
-            color: var(--td-brand-color);
-            border: 1px solid var(--td-brand-color-2);
+            background: rgba(124, 132, 255, 0.12);
+            color: var(--tf-accent);
+            border: 1px solid rgba(124, 132, 255, 0.18);
           }
 
           .resolution-tag {
-            background: var(--td-bg-color-component);
-            color: var(--td-text-color-secondary);
-            border: 1px solid var(--td-component-border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--tf-text-secondary);
+            border: 1px solid var(--tf-border-subtle);
           }
 
           .duration-tag {
-            background: var(--td-success-color-1);
-            color: var(--td-success-color);
-            border: 1px solid var(--td-success-color-2);
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--tf-success);
+            border: 1px solid rgba(34, 197, 94, 0.18);
           }
         }
 
         .prompt-text {
           margin: 0;
           font-size: 14px;
-          color: var(--td-text-color-secondary);
+          color: var(--tf-text-secondary);
           line-height: 1.6;
           display: -webkit-box;
           -webkit-line-clamp: 2;
@@ -543,20 +550,21 @@ function handleDeleteConfig(configId: number) {
       align-items: center;
       justify-content: center;
       padding: 60px 20px;
-      background: var(--td-bg-color-container);
+      background: var(--tf-surface-panel);
       border-radius: 16px;
-      border: 2px dashed var(--td-component-border);
+      border: 1px dashed var(--tf-border-strong);
+      box-shadow: var(--tf-shadow-soft);
 
       .empty-icon {
         width: 80px;
         height: 80px;
-        background: var(--td-bg-color-component);
-        border: 1px solid var(--td-component-border);
+        background: rgba(124, 132, 255, 0.08);
+        border: 1px solid rgba(124, 132, 255, 0.16);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--td-brand-color);
+        color: var(--tf-accent);
         margin-bottom: 20px;
       }
 
@@ -564,13 +572,13 @@ function handleDeleteConfig(configId: number) {
         margin: 0 0 8px;
         font-size: 18px;
         font-weight: 600;
-        color: var(--td-text-color-primary);
+        color: var(--tf-text-primary);
       }
 
       .empty-desc {
         margin: 0;
         font-size: 14px;
-        color: var(--td-text-color-placeholder);
+        color: var(--tf-text-secondary);
       }
     }
   }

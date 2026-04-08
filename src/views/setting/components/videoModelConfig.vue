@@ -1,5 +1,8 @@
 <template>
   <div class="videoModelConfig">
+    <div class="intro">
+      <p>视频生成模型统一在这里管理，保持供应商、接口地址和编辑入口集中，不分散到业务页内。</p>
+    </div>
     <t-button theme="primary" @click="addVideoModel" class="addVideoBtn">
       <template #icon>
         <i-plus theme="outline" size="16" fill="currentColor" />
@@ -55,6 +58,7 @@ import dayjs from "dayjs";
 
 interface VideoModelType {
   id: number;
+  name: string;
   model: string;
   modelType: string;
   manufacturer: string;
@@ -132,7 +136,12 @@ function formatTime(timestamp: number): string {
 async function loadVideoModels() {
   try {
     const res = await axios.post("/setting/getVideoModelList", { type: "video" });
-    videoModels.value = Array.isArray(res.data) ? res.data : [];
+    videoModels.value = Array.isArray(res.data)
+      ? res.data.map((item: Omit<VideoModelType, "name"> & { name?: string }) => ({
+          ...item,
+          name: item.name || item.model,
+        }))
+      : [];
   } catch (error) {
     console.error("加载视频模型列表失败", error);
     videoModels.value = [];
@@ -157,8 +166,29 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .videoModelConfig {
+  .intro {
+    margin-bottom: 16px;
+
+    p {
+      margin: 0;
+      color: var(--tf-text-secondary);
+      font: var(--tf-font-caption);
+    }
+  }
+
   .addVideoBtn {
     margin-bottom: 16px;
+    min-height: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(124, 132, 255, 0.18);
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(124, 132, 255, 0.22);
+    }
   }
 }
 
@@ -168,19 +198,24 @@ onMounted(() => {
   .clickableCard {
     cursor: pointer;
     border-radius: 12px;
-    transition: all 0.3s ease;
-    border: 1px solid var(--td-border-level-1-color);
-    background: var(--td-bg-color-container);
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease,
+      transform 0.18s ease;
+    border: 1px solid var(--tf-border-subtle);
+    background: var(--tf-surface-raised);
 
     &:hover {
-      box-shadow: 0 8px 24px rgba(var(--td-brand-color), 0.12);
-      border-color: var(--td-brand-color);
+      box-shadow: var(--tf-shadow-soft);
+      border-color: rgba(124, 132, 255, 0.22);
+      transform: translateY(-1px);
     }
   }
 
   :deep(.t-card__header) {
-    border-bottom: 1px solid var(--td-border-level-1-color);
+    border-bottom: 1px solid var(--tf-border-subtle);
     padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.02);
   }
 
   :deep(.t-card__body) {
@@ -200,8 +235,10 @@ onMounted(() => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, var(--td-brand-color-1) 0%, var(--td-brand-color-2) 100%);
-      border-radius: 8px;
+      background: rgba(124, 132, 255, 0.12);
+      border: 1px solid rgba(124, 132, 255, 0.18);
+      border-radius: 12px;
+      color: var(--tf-accent);
       flex-shrink: 0;
     }
 
@@ -215,7 +252,7 @@ onMounted(() => {
       .videoModelName {
         font-size: 15px;
         font-weight: 600;
-        color: var(--td-text-color-primary);
+        color: var(--tf-text-primary);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -224,12 +261,14 @@ onMounted(() => {
       .manufacturerTag {
         align-self: flex-start;
         margin: 0;
+        border-radius: 999px;
       }
     }
 
     .deleteBtnCorner {
       margin-left: auto;
       flex-shrink: 0;
+      border-radius: 10px;
     }
   }
 
@@ -245,14 +284,14 @@ onMounted(() => {
       font-size: 13px;
 
       .detailLabel {
-        color: var(--td-text-color-secondary);
+        color: var(--tf-text-secondary);
         font-weight: 500;
         min-width: 80px;
         flex-shrink: 0;
       }
 
       .detailValue {
-        color: var(--td-text-color-primary);
+        color: var(--tf-text-primary);
         flex: 1;
         overflow: hidden;
         text-overflow: ellipsis;

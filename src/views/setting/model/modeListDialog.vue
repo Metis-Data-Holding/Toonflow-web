@@ -1,5 +1,5 @@
 <template>
-  <t-dialog v-model:visible="modelShow" :header="props.state" width="70vw" top="1vh">
+  <t-dialog v-model:visible="modelShow" :header="props.state" width="70vw" top="1vh" class="model-select-dialog">
     <div class="addModelContainer">
       <div class="model-cards-container">
         <t-tabs v-model="activeTab" class="model-tabs" @change="getData">
@@ -27,7 +27,7 @@
                     :checked="selectedManufacturers.includes(manufacturer.key)"
                     @change="toggleManufacturer(manufacturer.key)"
                     class="manufacturer-tag">
-                    <a-badge :color="getManufacturerColor(manufacturer.key)" />
+                    <span class="manufacturer-dot"></span>
                     {{ manufacturer.name }}
                   </a-checkable-tag>
                 </div>
@@ -42,7 +42,7 @@
               </div>
             </div>
 
-            <a-divider style="margin: 16px 0" />
+            <a-divider class="dialog-divider" />
             <div class="cards-grid">
               <a-empty v-if="getFilteredModels(tab.key).length === 0" description="未找到匹配的模型" :image="Empty.PRESENTED_IMAGE_SIMPLE" />
               <template v-else>
@@ -52,11 +52,11 @@
                   class="model-card"
                   @click="selectModel(model)">
                   <div class="card-icon">
-                    <component :is="tab.icon" fill="#9810fa" />
+                    <component :is="tab.icon" fill="currentColor" />
                   </div>
                   <div class="card-header">
                     <h3 :title="model.modelName">{{ model.modelName }}</h3>
-                    <a-tag :color="getManufacturerColor(model.manufacturer)">{{ model.manufacturerName }}</a-tag>
+                    <a-tag>{{ model.manufacturerName }}</a-tag>
                   </div>
                 </div>
                 <!-- 自定义卡片 -->
@@ -166,29 +166,6 @@ const manufacturerNames: Record<string, string> = {
   grsai: "Grsai",
   other: "其他",
 };
-
-// 获取厂商颜色
-function getManufacturerColor(manufacturer: string): string {
-  const colors: Record<string, string> = {
-    deepSeek: "blue",
-    volcengine: "orange",
-    kling: "purple",
-    zhipu: "cyan",
-    qwen: "green",
-    wan: "green",
-    openrouter: "gold",
-    openai: "geekblue",
-    vidu: "magenta",
-    anthropic: "volcano",
-    runninghub: "gold",
-    gemini: "lime",
-    modelScope: "#634BFE",
-    xai: "red",
-    grsai: "#2B7FFF",
-    other: "default",
-  };
-  return colors[manufacturer] || "default";
-}
 
 // 厂商默认 BaseURL 配置
 const manufacturerDefaultBaseUrls: Record<string, Record<string, string>> = {
@@ -567,6 +544,23 @@ function getData() {
 </script>
 
 <style lang="scss" scoped>
+.model-select-dialog {
+  :deep(.t-dialog) {
+    border: 1px solid var(--tf-border-subtle);
+    box-shadow: var(--tf-shadow-2);
+  }
+
+  :deep(.t-dialog__header),
+  :deep(.t-dialog__body),
+  :deep(.t-dialog__footer) {
+    background: var(--tf-bg-panel);
+  }
+
+  :deep(.t-dialog__header) {
+    border-bottom: 1px solid var(--tf-border-subtle);
+  }
+}
+
 .addModelContainer {
   width: 100%;
   height: 80vh;
@@ -581,34 +575,46 @@ function getData() {
   :deep(.t-tabs__nav) {
     margin-bottom: 24px;
   }
+
+  :deep(.t-tabs__nav-item) {
+    color: var(--tf-text-secondary);
+  }
+
+  :deep(.t-tabs__nav-item.t-is-active) {
+    color: var(--tf-text-primary);
+  }
+
+  :deep(.t-tabs__bar) {
+    background: var(--tf-accent);
+  }
 }
 
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  gap: 16px;
   padding: 10px 0;
 }
 
 .model-card {
-  border: 1px solid #f0f0f0;
-  border-radius: 10px;
+  border: 1px solid var(--tf-border-subtle);
+  border-radius: 12px;
   padding: 20px;
   cursor: pointer;
   transition: all 0.25s ease;
-  background: #fff;
+  background: var(--tf-bg-panel);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    transform: translateY(-4px);
+    border-color: var(--tf-border-strong);
+    background: var(--tf-bg-panel-2);
+    transform: translateY(-1px);
   }
 
   .card-icon {
     font-size: 24px;
-    color: #1890ff;
+    color: var(--tf-accent-hover);
     transition: all 0.25s ease;
     &:deep(.anticon) {
       display: block;
@@ -616,7 +622,7 @@ function getData() {
   }
 
   &:hover .card-icon {
-    color: #40a9ff;
+    color: var(--tf-text-primary);
   }
 
   .card-header {
@@ -630,18 +636,20 @@ function getData() {
       margin: 0;
       font-size: 15px;
       font-weight: 600;
-      color: #262626;
+      color: var(--tf-text-primary);
       overflow: hidden;
       flex: 1;
     }
 
     :deep(.ant-tag) {
-      border-radius: 4px;
-      border: 0;
+      border-radius: 10px;
+      border: 1px solid var(--tf-border-subtle);
       font-size: 12px;
       font-weight: 500;
       padding: 4px 10px;
       flex-shrink: 0;
+      background: var(--tf-bg-panel-2);
+      color: var(--tf-text-secondary);
     }
   }
 
@@ -652,14 +660,14 @@ function getData() {
     justify-content: space-between;
 
     .model-description {
-      color: #8c8c8c;
+      color: var(--tf-text-secondary);
       font-size: 13px;
       line-height: 1.5;
     }
 
     .model-type {
       font-size: 12px;
-      color: #8c8c8c;
+      color: var(--tf-text-muted);
 
       .type-label {
         font-weight: 500;
@@ -670,8 +678,8 @@ function getData() {
 }
 
 .custom-card {
-  border: 1px dashed #d9d9d9;
-  background: #fafafa;
+  border: 1px dashed var(--tf-border-strong);
+  background: var(--tf-bg-panel-2);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -679,34 +687,33 @@ function getData() {
   transition: all 0.25s ease;
 
   &:hover {
-    border-color: #1890ff;
-    background: #f5f9ff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border-color: rgba(124, 132, 255, 0.32);
+    background: var(--tf-bg-float);
 
     .card-icon {
-      color: #40a9ff;
+      color: var(--tf-text-primary);
     }
 
     .card-header h3 {
-      color: #1890ff;
+      color: var(--tf-text-primary);
     }
   }
 
   .card-icon {
-    color: #1890ff;
+    color: var(--tf-accent-hover);
     font-size: 36px;
     margin-bottom: 8px;
     transition: all 0.25s ease;
   }
 
   .card-header h3 {
-    color: #1890ff;
+    color: var(--tf-accent-hover);
     font-weight: 600;
     transition: color 0.25s ease;
   }
 
   .card-body .model-description {
-    color: #8c8c8c;
+    color: var(--tf-text-secondary);
     text-align: center;
     font-size: 13px;
   }
@@ -717,6 +724,11 @@ function getData() {
   margin-bottom: 20px;
 }
 
+.dialog-divider {
+  margin: 16px 0;
+  border-color: var(--tf-border-subtle);
+}
+
 .search-wrapper {
   margin-bottom: 16px;
 
@@ -724,31 +736,33 @@ function getData() {
     max-width: 500px;
 
     :deep(.t-input__wrap) {
-      border-radius: 6px;
-      border: 1px solid #f0f0f0;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      border-radius: 12px;
+      border: 1px solid var(--tf-border-subtle);
+      background: var(--tf-bg-input);
       transition: all 0.25s ease;
 
       &:hover {
-        border-color: #d9d9d9;
+        border-color: var(--tf-border-strong);
       }
 
       &:focus-within {
-        border-color: #1890ff;
-        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.12);
+        border-color: var(--tf-accent);
+        box-shadow: 0 0 0 3px var(--tf-accent-softer);
       }
     }
 
     :deep(.t-input) {
       font-size: 14px;
+      color: var(--tf-text-primary);
     }
   }
 }
 
 .manufacturer-filter {
-  border-radius: 6px;
+  border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: var(--tf-bg-panel-2);
+  border: 1px solid var(--tf-border-subtle);
   .filter-header {
     display: flex;
     justify-content: space-between;
@@ -758,13 +772,18 @@ function getData() {
     .filter-label {
       font-size: 14px;
       font-weight: 500;
-      color: #636464;
+      color: var(--tf-text-primary);
       display: flex;
       align-items: center;
       gap: 6px;
       :deep(.anticon) {
-        color: #1890ff;
+        color: var(--tf-accent-hover);
       }
+    }
+
+    :deep(.ant-btn-link) {
+      color: var(--tf-text-secondary);
+      padding-inline: 0;
     }
   }
 
@@ -778,39 +797,39 @@ function getData() {
       align-items: center;
       gap: 6px;
       padding: 6px 14px;
-      border-radius: 14px;
+      border-radius: 10px;
       font-size: 13px;
       cursor: pointer;
       transition: all 0.25s ease;
-      border: 1px solid #d9d9d9;
-      background: #fff;
+      border: 1px solid var(--tf-border-subtle);
+      background: var(--tf-bg-panel);
+      color: var(--tf-text-secondary);
       user-select: none;
 
+      .manufacturer-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: currentColor;
+        opacity: 0.72;
+      }
+
       &:hover {
-        border-color: #1890ff;
-        color: #1890ff;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 6px rgba(24, 144, 255, 0.12);
+        border-color: var(--tf-border-strong);
+        color: var(--tf-text-primary);
+        background: var(--tf-bg-float);
       }
 
       &.ant-tag-checkable-checked {
-        background: #1890ff;
-        border-color: #1890ff;
-        color: #fff;
+        background: var(--tf-accent-soft);
+        border-color: rgba(124, 132, 255, 0.28);
+        color: var(--tf-text-primary);
         font-weight: 500;
-        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.25);
 
         &:hover {
-          background: #40a9ff;
-          border-color: #40a9ff;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+          background: rgba(124, 132, 255, 0.22);
+          border-color: rgba(124, 132, 255, 0.34);
         }
-      }
-
-      :deep(.ant-badge-status-dot) {
-        width: 8px;
-        height: 8px;
       }
     }
   }
@@ -819,17 +838,17 @@ function getData() {
 .filter-result {
   margin-top: 12px;
   padding: 8px 12px;
-  background: #e6f7ff;
-  border-left: 3px solid #1890ff;
-  border-radius: 4px;
+  background: var(--tf-accent-softer);
+  border: 1px solid rgba(124, 132, 255, 0.22);
+  border-radius: 10px;
 
   .result-text {
     font-size: 13px;
-    color: #0050b3;
+    color: var(--tf-text-secondary);
 
     strong {
       font-weight: 600;
-      color: #1890ff;
+      color: var(--tf-text-primary);
       font-size: 14px;
     }
   }
@@ -840,7 +859,7 @@ function getData() {
   margin: 60px 0;
 
   .ant-empty-description {
-    color: #8c8c8c;
+    color: var(--tf-text-secondary);
     font-size: 14px;
   }
 }

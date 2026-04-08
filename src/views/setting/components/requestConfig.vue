@@ -1,5 +1,8 @@
 <template>
   <div class="request-config">
+    <div class="intro">
+      <p>优先用于切换运行环境、远程服务地址和联调入口。</p>
+    </div>
     <t-form :data="formData" labelAlign="top" :rules="formRules" @submit="handleSubmit">
       <t-form-item label="API 地址" name="baseUrl">
         <t-input v-model="formData.baseUrl" :placeholder="endpointDefaults.baseUrl" clearable>
@@ -16,7 +19,7 @@
         </t-input>
       </t-form-item>
       <t-form-item>
-        <t-space size="small">
+        <t-space size="small" class="actionRow">
           <t-button theme="primary" type="submit">保存</t-button>
           <t-button theme="default" @click="handleReset">重置</t-button>
         </t-space>
@@ -94,6 +97,20 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .request-config {
-  padding: 10px 0;
+  padding: 4px 0;
+
+  .intro {
+    margin-bottom: 16px;
+
+    p {
+      margin: 0;
+      color: var(--tf-text-secondary);
+      font: var(--tf-font-caption);
+    }
+  }
+
+  .actionRow {
+    margin-top: 4px;
+  }
 }
 </style>

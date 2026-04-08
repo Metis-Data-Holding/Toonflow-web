@@ -1,21 +1,24 @@
 <template>
-  <div class="taskList">
-    <div class="header">
-      <h2 class="title">我的任务</h2>
+  <div class="taskList tf-page">
+    <div class="header tf-page-header">
+      <div class="tf-page-heading">
+        <h2 class="title tf-page-title">我的任务</h2>
+        <p class="tf-page-description">查看任务状态、筛选条件与执行进度</p>
+      </div>
     </div>
-    <div class="search f">
+    <div class="search tf-toolbar">
       <div>
         <t-select label="任务大类：" v-model="taskClass" :options="taskCategories" />
       </div>
-      <div style="margin-left: 20px">
+      <div class="searchItem">
         <t-select label="状态：" v-model="state">
           <t-option key="1" label="进行中" value="1" />
           <t-option key="2" label="已完成" value="2" />
         </t-select>
       </div>
-      <t-button style="margin-left: 10px">查询</t-button>
+      <t-button theme="primary">查询</t-button>
     </div>
-    <div class="content">
+    <div class="content tf-table-shell">
       <vxe-table ref="tableRef" :data="taskItem">
         <vxe-column title="任务大类" field="taskClass" width="200" show-overflow="title"></vxe-column>
         <vxe-column title="关联对象" field="relatedObjects" width="200" show-overflow="title"></vxe-column>
@@ -25,7 +28,7 @@
           <template #default="{ row }">
             <span
               :style="{
-                color: row.state === '进行中' ? '#1890ff' : '#52c41a',
+                color: row.state === '进行中' ? 'var(--tf-accent-hover)' : 'var(--tf-success)',
                 fontWeight: 'bold',
               }">
               {{ row.state }}
@@ -38,7 +41,7 @@
           </template>
         </vxe-column>
       </vxe-table>
-      <div class="pagination" style="margin-top: 10px; text-align: right;ma">
+      <div class="pagination">
         <t-pagination
           v-model:current="pageValue.page"
           v-model:pageSize="pageValue.limit"
@@ -56,7 +59,6 @@
 import { ref } from "vue";
 import store from "@/stores";
 import axios from "@/utils/axios";
-import { message } from "ant-design-vue";
 import dayjs from "dayjs";
 import taskDetails from "./components/taskDetails.vue";
 import type { PageInfo } from "tdesign-vue-next";
@@ -91,7 +93,7 @@ function changeFn(pageInfo: PageInfo) {
 const taskItem = ref<taskData[]>([]);
 
 const open = ref<boolean>(false);
-const currentRow = ref<any>(null);
+const currentRow = ref<taskData | null>(null);
 
 onMounted(() => {
   getTaskCategories();
@@ -104,7 +106,7 @@ function getTaskCategories() {
       projectId: projectId.value,
     })
     .then(({ data }) => {
-      taskCategories.value = data.map((item: any) => ({
+      taskCategories.value = data.map((item: { taskClass: string }) => ({
         label: item.taskClass,
         value: item.taskClass,
       }));
@@ -137,28 +139,24 @@ function getTaskList() {
 <style lang="scss" scoped>
 .taskList {
   width: 100%;
-  margin: 0 auto;
-  padding: 32px;
   background: transparent;
+
   .search {
-    margin-bottom: 2rem;
     display: flex;
     align-items: center;
-    .ant-input-group {
-      margin-right: 1rem;
+    .searchItem {
+      margin-left: 0;
     }
   }
-  .header {
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    .title {
-      font-size: 2rem;
-      font-weight: 600;
-      color: #1a202c;
-      margin-bottom: 0.5rem;
-    }
+
+  .content {
+    padding: 8px 8px 16px;
+  }
+
+  .pagination {
+    margin-top: 16px !important;
+    padding-right: 8px;
+    text-align: right;
   }
 }
 </style>

@@ -30,14 +30,14 @@
                 <i-preview-open
                   @click="
                     previewImage = cell.src;
-                    previewPrompt = cell.prompt;
+                    previewPrompt = cell.prompt || '';
                     visible = true;
                   "
                   class="preview"
                   theme="outline"
                   size="24" />
               </template>
-              <div v-else class="cellText" @click="updateCellPrompt($event, cell, grid.segmentId)" @keydown.enter.prevent="$event.target.blur()">
+              <div v-else class="cellText" @click="updateCellPrompt($event, cell, grid.segmentId)" @keydown.enter.prevent="handleCellKeydown">
                 {{ cell.prompt }}
               </div>
             </div>
@@ -61,20 +61,65 @@
   </el-image-viewer>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import storyboardEditor from "@/components/storyboardEditor/index.vue";
 import mainStore from "@/stores/index";
-const editorRef = ref(null);
+
+interface CanvasAssetTag {
+  type: "role" | "props" | "scene";
+  text: string;
+}
+
+interface CanvasGridCell {
+  id?: string;
+  src?: string;
+  prompt?: string;
+}
+
+interface CanvasGridItem {
+  id?: number;
+  segmentId: number;
+  title: string;
+  fragmentContent: string;
+  assetsTags: CanvasAssetTag[];
+  cells: CanvasGridCell[];
+  x: number;
+  y: number;
+  zIndex?: number;
+}
+
+interface FusionEditPayload {
+  id: number;
+  filePath: string;
+  otherImgs: string[];
+  prompt: string;
+  editPrompt: string;
+  intro: string;
+  scriptId: number;
+  generateImg: string[];
+}
+
+interface StoryboardEditorRef {
+  doFusionEdit: (payload: FusionEditPayload) => void;
+}
+
+const editorRef = ref<StoryboardEditorRef | null>(null);
 const { project } = storeToRefs(mainStore());
-const props = defineProps({
-  modelValue: { type: Array, required: true },
-  generatingIds: { type: [Array, Set], default: () => [] },
-});
+const props = withDefaults(
+  defineProps<{
+    modelValue: CanvasGridItem[];
+    generatingIds?: Array<number> | Set<number>;
+  }>(),
+  {
+    generatingIds: () => [],
+  },
+);
 
 const emit = defineEmits(["update:modelValue", "generateImage", "replaceShot"]);
 
 // 检查分镜是否正在生成中（使用 Shot.id 匹配）
-const isGenerating = (shotId) => {
+const isGenerating = (shotId?: number) => {
+  if (shotId == null) return false;
   if (props.generatingIds instanceof Set) {
     return props.generatingIds.has(shotId);
   }
@@ -82,17 +127,18 @@ const isGenerating = (shotId) => {
 };
 
 const clickOption = {
-  segmentId: null,
-  cellId: null,
+  segmentId: null as number | null,
+  cellId: null as string | null,
 };
-function editImage(cell, segmentId) {
+function editImage(cell: CanvasGridCell, segmentId: number) {
   clickOption.segmentId = segmentId;
-  clickOption.cellId = cell.id;
+  clickOption.cellId = cell.id || null;
+  if (!editorRef.value || !cell.src) return;
   editorRef.value.doFusionEdit({
     id: -1,
     filePath: cell.src,
     otherImgs: [],
-    prompt: cell.prompt,
+    prompt: cell.prompt || "",
     editPrompt: "@图1 进行细节优化",
     intro: "",
     scriptId: -1,
@@ -100,9 +146,9 @@ function editImage(cell, segmentId) {
   });
 }
 
-async function saveImage(data) {
+async function saveImage(data: { filePath: string }) {
   if (clickOption.segmentId && clickOption.cellId) {
-    let cellData;
+    let cellData: CanvasGridCell | undefined;
     const updatedValue = props.modelValue.map((item) => {
       if (item.segmentId === clickOption.segmentId) {
         const updatedCells = item.cells.map((cell) => {
@@ -128,8 +174,8 @@ async function saveImage(data) {
   }
 }
 
-const viewportRef = ref(null);
-const canvasRef = ref(null);
+const viewportRef = ref<HTMLDivElement | null>(null);
+const canvasRef = ref<HTMLDivElement | null>(null);
 
 const state = ref({
   x: 0,
@@ -143,7 +189,7 @@ const state = ref({
 });
 
 const dragState = ref({
-  draggingId: null,
+  draggingId: null as number | string | null,
   startX: 0,
   startY: 0,
   gridStartX: 0,
@@ -152,7 +198,7 @@ const dragState = ref({
 });
 
 // 根据cells数量计算网格样式
-const getGridStyle = (count) => {
+const getGridStyle = (count: number) => {
   let cols, rows;
 
   if (count <= 2) {
@@ -204,7 +250,7 @@ const canvasStyle = computed(() => ({
   transform: `translate(${state.value.x}px, ${state.value.y}px) scale(${state.value.scale})`,
 }));
 
-const handleViewportMouseDown = (e) => {
+const handleViewportMouseDown = (e: MouseEvent) => {
   if (e.target === viewportRef.value || e.target === canvasRef.value) {
     state.value.isDragging = true;
     state.value.startX = e.clientX - state.value.x;
@@ -212,7 +258,7 @@ const handleViewportMouseDown = (e) => {
   }
 };
 
-const handleGridMouseDown = (e, grid) => {
+const handleGridMouseDown = (e: MouseEvent, grid: CanvasGridItem) => {
   // 只有当前实例处理拖拽，使用 id 或 segmentId 作为唯一标识符
   dragState.value.draggingId = grid.id || grid.segmentId;
   dragState.value.startX = e.clientX;
@@ -225,11 +271,12 @@ const handleGridMouseDown = (e, grid) => {
   e.stopPropagation();
 };
 
-const handleWheel = (e) => {
+const handleWheel = (e: WheelEvent) => {
   const delta = e.deltaY > 0 ? -0.1 : 0.1;
   const newScale = Math.max(state.value.minScale, Math.min(state.value.maxScale, state.value.scale + delta));
   if (newScale === state.value.scale) return;
 
+  if (!viewportRef.value) return;
   const rect = viewportRef.value.getBoundingClientRect();
   const mouseX = e.clientX - rect.left;
   const mouseY = e.clientY - rect.top;
@@ -240,10 +287,10 @@ const handleWheel = (e) => {
   state.value.scale = newScale;
 };
 
-const focusOnGrid = (gridId, duration = 300) => {
+const focusOnGrid = (gridId: number, duration = 300) => {
   // 支持使用 id 或 segmentId 查找
   const gridData = props.modelValue.find((item) => (item.id || item.segmentId) === gridId);
-  const gridElement = canvasRef.value?.querySelector(`[data-id="${gridId}"]`);
+  const gridElement = canvasRef.value?.querySelector(`[data-id="${gridId}"]`) as HTMLElement | null;
   if (!gridData || !gridElement || !viewportRef.value) return;
 
   const viewportRect = viewportRef.value.getBoundingClientRect();
@@ -254,7 +301,7 @@ const focusOnGrid = (gridId, duration = 300) => {
   const startY = state.value.y;
   const startTime = performance.now();
 
-  const animate = (currentTime) => {
+  const animate = (currentTime: number) => {
     const progress = Math.min((currentTime - startTime) / duration, 1);
     const ease = 1 - Math.pow(1 - progress, 3);
 
@@ -270,15 +317,15 @@ const focusOnGrid = (gridId, duration = 300) => {
 defineExpose({ focusOnGrid });
 
 // 存储实例专用的事件处理器引用
-let instanceMouseMove = null;
-let instanceMouseUp = null;
+let instanceMouseMove: ((e: MouseEvent) => void) | null = null;
+let instanceMouseUp: (() => void) | null = null;
 
 // z-index 计数器，用于管理层级
 let zIndexCounter = 10;
 
 onMounted(() => {
   // 为每个实例创建独立的事件处理器，使用闭包保证实例隔离
-  instanceMouseMove = (e) => {
+  instanceMouseMove = (e: MouseEvent) => {
     // 只处理当前实例的拖拽状态
     if (dragState.value.draggingId !== null && dragState.value.isActive) {
       e.stopPropagation();
@@ -337,23 +384,27 @@ onUnmounted(() => {
   }
 });
 
-function generatingImage(grid) {
+function generatingImage(grid: CanvasGridItem) {
   emit("generateImage", grid);
 }
 
-function updateCellPrompt(event, cell, segmentId) {
+function handleCellKeydown(event: KeyboardEvent) {
+  (event.target as HTMLElement | null)?.blur();
+}
+
+function updateCellPrompt(event: MouseEvent, cell: CanvasGridCell, segmentId: number) {
   ElMessageBox.prompt("请输入镜头提示词", "提示词", {
     confirmButtonText: "确认",
     cancelButtonText: "取消",
-    inputValue: cell.prompt,
+    inputValue: cell.prompt || "",
     inputType: "textarea",
-  }).then(({ value }) => {
-    if (value !== cell.prompt) {
-      let updatedCell;
+  }).then(({ value }: { value: string }) => {
+    if (value !== (cell.prompt || "")) {
+      let updatedCell: CanvasGridCell | undefined;
       const updatedValue = props.modelValue.map((item) => {
         if (item.segmentId === segmentId) {
           const updatedCells = item.cells.map((c) => {
-            if (c.id === cell.id) {
+            if (c.id && c.id === cell.id) {
               updatedCell = { ...c, prompt: value };
               return updatedCell;
             }
@@ -377,7 +428,7 @@ const previewImage = ref("");
 const previewPrompt = ref("");
 const visible = ref(false);
 
-const setVisible = (value) => {
+const setVisible = (value: boolean) => {
   visible.value = value;
   if (!value) {
     previewPrompt.value = "";
@@ -386,13 +437,13 @@ const setVisible = (value) => {
 </script>
 
 <style lang="scss" scoped>
-$primaryColor: #1890ff;
-$bgColor: #e8e8e8;
-$gridLineColor: #d0d0d0;
+$primaryColor: #7c84ff;
+$bgColor: #0f1217;
+$gridLineColor: rgba(255, 255, 255, 0.06);
 $shadowMedium: rgba(0, 0, 0, 0.15);
 $shadowDark: rgba(0, 0, 0, 0.3);
-$promptBg: rgba(0, 0, 0, 0.6);
-$hoverBg: #e8f4ff;
+$promptBg: rgba(11, 13, 16, 0.78);
+$hoverBg: rgba(124, 132, 255, 0.08);
 
 .viewport {
   width: 100%;
@@ -418,15 +469,18 @@ $hoverBg: #e8f4ff;
 .gridContainer {
   position: absolute;
   padding: 10px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+  background: var(--tf-surface-raised);
+  border: 1px solid var(--tf-border-strong);
+  border-radius: 12px;
+  box-shadow: var(--tf-shadow-soft);
   user-select: none;
-  transition: box-shadow 0.3s;
+  transition:
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
 
   &:hover {
     box-shadow: 0 8px 24px $shadowMedium;
+    border-color: rgba(124, 132, 255, 0.22);
   }
 
   &.dragging {
@@ -443,15 +497,17 @@ $hoverBg: #e8f4ff;
   .topMenu {
     margin-bottom: 8px;
     cursor: move;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 8px;
+    border-radius: 10px;
     transition: background-color 0.2s;
     width: 100%;
     min-width: 0;
+    background: rgba(255, 255, 255, 0.02);
     .gridTitle {
       font-size: 14px;
       margin-bottom: 8px;
       font-weight: 500;
+      color: var(--tf-text-primary);
       flex: 1;
       min-width: 0;
       white-space: nowrap;
@@ -466,6 +522,7 @@ $hoverBg: #e8f4ff;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--tf-text-secondary);
     }
     .btnList {
       & > * {
@@ -478,14 +535,14 @@ $hoverBg: #e8f4ff;
 .grid {
   display: grid;
   gap: 2px;
-  border: 2px solid #ccc;
-  background: #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--tf-border-subtle);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
   overflow: hidden;
 }
 
 .gridItem {
-  background: #fff;
+  background: #111318;
   overflow: hidden;
   position: relative;
   cursor: pointer;
@@ -529,11 +586,11 @@ $hoverBg: #e8f4ff;
     top: 4px;
     left: 4px;
     background: rgba(0, 0, 0, 0.6);
-    color: #fff;
+    color: var(--tf-text-primary);
     backdrop-filter: blur(4px);
     font-size: 12px;
-    padding: 2px;
-    border-radius: 4px;
+    padding: 3px 6px;
+    border-radius: 999px;
   }
 }
 
@@ -550,6 +607,7 @@ $hoverBg: #e8f4ff;
   padding: 8px;
   text-align: center;
   outline: none;
+  color: var(--tf-text-secondary);
 }
 
 .cellPrompt {
@@ -558,7 +616,7 @@ $hoverBg: #e8f4ff;
   left: 0;
   right: 0;
   background: $promptBg;
-  color: #fff;
+  color: var(--tf-text-primary);
   font-size: 10px;
   padding: 2px 4px;
   white-space: nowrap;
@@ -573,15 +631,16 @@ $hoverBg: #e8f4ff;
   top: 5px;
   right: 5px;
   display: none;
-  color: #fff;
+  color: var(--tf-text-primary);
 }
 </style>
 
 <style lang="scss">
 .viewer-prompt {
-  color: #ffffff !important;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 5px;
-  border-radius: 5px;
+  color: var(--tf-text-primary) !important;
+  background: rgba(11, 13, 16, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 10px;
+  border-radius: 10px;
 }
 </style>

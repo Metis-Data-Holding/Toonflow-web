@@ -1,10 +1,13 @@
 <template>
   <div class="aboutPage">
+    <div class="intro">
+      <p>版本信息、开源仓库和更新入口统一收纳在这里，避免信息分散在多个页面。</p>
+    </div>
     <t-card class="logoCard">
       <div class="logoSection">
-        <img src="@/assets/logo.png" alt="ToonFlow Logo" class="logo" />
+        <img src="@/assets/logo.svg" alt="ToonFlow Logo" class="logo" />
         <h2 class="appName">ToonFlow</h2>
-        <t-tag theme="primary" variant="light">{{ version }}</t-tag>
+        <t-tag theme="primary" variant="outline">{{ version }}</t-tag>
       </div>
       <p class="desc">开源的 AI 驱动漫画/分镜创作工具</p>
     </t-card>
@@ -56,19 +59,27 @@ function openLink(url: string) {
 
 <style lang="scss" scoped>
 .aboutPage {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  padding: 16px;
-  max-width: 480px;
+  max-width: 560px;
+
+  .intro {
+    p {
+      margin: 0;
+      color: var(--tf-text-secondary);
+      font: var(--tf-font-caption);
+    }
+  }
 }
 
 .logoCard {
-  margin-bottom: 1rem;
-
   :deep(.t-card__body) {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 32px 16px;
+    gap: 10px;
+    padding: 28px 24px;
   }
 
   .logoSection {
@@ -82,6 +93,7 @@ function openLink(url: string) {
     width: 72px;
     height: 72px;
     border-radius: 16px;
+    box-shadow: var(--tf-shadow-soft);
   }
 
   .appName {
@@ -91,15 +103,14 @@ function openLink(url: string) {
   }
 
   .desc {
-    margin: 16px 0 0;
+    margin: 2px 0 0;
     font-size: 14px;
-    color: var(--td-text-color-secondary);
+    color: var(--tf-text-secondary);
     text-align: center;
   }
 }
 
 .linkCard {
-  margin-bottom: 1rem;
   :deep(.t-card__body) {
     padding: 0;
   }
@@ -114,10 +125,12 @@ function openLink(url: string) {
     gap: 12px;
     padding: 16px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease;
 
     &:hover {
-      background-color: var(--td-bg-color-container-hover);
+      background-color: rgba(255, 255, 255, 0.03);
     }
 
     span {
@@ -126,7 +139,7 @@ function openLink(url: string) {
     }
 
     .arrow {
-      color: var(--td-text-color-placeholder);
+      color: var(--tf-text-tertiary);
     }
   }
 }
@@ -142,7 +155,7 @@ function openLink(url: string) {
     justify-content: center;
     gap: 8px;
     font-size: 14px;
-    color: var(--td-text-color-secondary);
+    color: var(--tf-text-secondary);
   }
 }
 </style>
