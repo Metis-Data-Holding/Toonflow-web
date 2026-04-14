@@ -5,8 +5,8 @@
     </div>
     <t-card class="logoCard">
       <div class="logoSection">
-        <img src="@/assets/logo.svg" alt="ToonFlow Logo" class="logo" />
-        <h2 class="appName">ToonFlow</h2>
+        <img src="@/assets/logo.svg" alt="Metis Logo" class="logo" />
+        <h2 class="appName">Metis</h2>
         <t-tag theme="primary" variant="outline">{{ version }}</t-tag>
       </div>
       <p class="desc">开源的 AI 驱动漫画/分镜创作工具</p>

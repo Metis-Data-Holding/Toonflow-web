@@ -250,7 +250,7 @@ function taskFn() {
           opacity 0.18s ease;
 
         &.navActive {
-          color: #62e0ac;
+          color: var(--tf-accent-hover);
 
           &::after {
             content: "";
@@ -261,7 +261,7 @@ function taskFn() {
             height: 3px;
             border-radius: 999px;
             background: currentColor;
-            box-shadow: 0 0 16px rgba(98, 224, 172, 0.32);
+            box-shadow: 0 0 16px var(--tf-accent-soft);
             z-index: 2;
           }
         }

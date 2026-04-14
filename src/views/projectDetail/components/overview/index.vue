@@ -4,7 +4,7 @@
       <h2 class="overviewTitle">项目概览</h2>
     </div>
     <div class="overviewStats">
-      <div v-for="stat in stats" :key="stat.label" :class="['statGridItem', stat.color]">
+      <div v-for="stat in stats" :key="stat.label" class="statGridItem">
         <div class="statGridTop">
           <div class="statIcon">
             <component :is="stat.icon" :size="22" />
@@ -172,25 +172,21 @@ const stats = computed(() => [
     label: "角色数量",
     value: statsData.value.roleCount || 0,
     icon: "i-peoples",
-    color: "statMint",
   },
   {
     label: "剧本集数",
     value: statsData.value.scriptCount || 0,
     icon: "i-doc-detail",
-    color: "statBlue",
   },
   {
     label: "分镜数量",
     value: statsData.value.storyboardCount || 0,
     icon: "i-carousel-video",
-    color: "statEmerald",
   },
   {
     label: "视频数量",
     value: statsData.value.videoCount || 0,
     icon: "i-video-one",
-    color: "statAmber",
   },
 ]);
 function updateProjectIntro() {
@@ -284,7 +280,7 @@ function selectArtStyle() {
     min-height: 182px;
     padding: 34px 22px 28px;
     border-radius: 18px;
-    border: 1px solid rgba(98, 224, 172, 0.22);
+    border: 1px solid var(--tf-accent-soft);
     background: rgba(255, 255, 255, 0.018);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.03),
@@ -297,28 +293,9 @@ function selectArtStyle() {
       inset: 0;
       border-radius: inherit;
       pointer-events: none;
-      border: 1px solid transparent;
-      opacity: 0.65;
-    }
-
-    &.statMint::after {
-      border-color: rgba(98, 224, 172, 0.42);
-      box-shadow: 0 0 24px rgba(98, 224, 172, 0.12);
-    }
-
-    &.statBlue::after {
-      border-color: rgba(98, 224, 172, 0.38);
-      box-shadow: 0 0 24px rgba(98, 224, 172, 0.1);
-    }
-
-    &.statEmerald::after {
-      border-color: rgba(98, 224, 172, 0.38);
-      box-shadow: 0 0 24px rgba(98, 224, 172, 0.1);
-    }
-
-    &.statAmber::after {
-      border-color: rgba(98, 224, 172, 0.38);
-      box-shadow: 0 0 24px rgba(98, 224, 172, 0.1);
+      border: 1px solid var(--tf-accent-soft);
+      opacity: 0.72;
+      box-shadow: 0 0 24px var(--tf-accent-softer);
     }
 
     .statGridTop {
@@ -350,25 +327,9 @@ function selectArtStyle() {
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      color: #62e0ac;
-      background: rgba(98, 224, 172, 0.1);
-      border: 1px solid rgba(98, 224, 172, 0.16);
-    }
-
-    &.statMint .statIcon {
-      color: #62e0ac;
-    }
-
-    &.statBlue .statIcon {
-      color: #62e0ac;
-    }
-
-    &.statEmerald .statIcon {
-      color: #62e0ac;
-    }
-
-    &.statAmber .statIcon {
-      color: #62e0ac;
+      color: var(--tf-accent-hover);
+      background: var(--tf-accent-softer);
+      border: 1px solid var(--tf-accent-soft);
     }
 
     .statLabel {
@@ -383,7 +344,7 @@ function selectArtStyle() {
     .statValue {
       font-size: 30px;
       font-weight: 700;
-      color: var(--tf-text-primary);
+      color: var(--tf-accent-hover);
       line-height: 1;
       letter-spacing: -0.03em;
     }
@@ -442,7 +403,7 @@ function selectArtStyle() {
 
   &:hover {
     color: var(--tf-accent-hover);
-    background: rgba(124, 132, 255, 0.08);
+    background: var(--tf-accent-softer);
   }
 }
 

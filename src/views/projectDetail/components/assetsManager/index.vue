@@ -525,15 +525,15 @@ watch(batchShow, (val) => {
         align-items: center;
         min-width: 92px;
         padding: 10px 18px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+        background: linear-gradient(180deg, var(--tf-accent-softer) 0%, rgba(255, 255, 255, 0.02) 100%);
         border-radius: 12px;
-        border: 1px solid var(--tf-border-subtle);
+        border: 1px solid var(--tf-accent-soft);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 
         .stat-value {
           font-size: 22px;
           font-weight: 700;
-          color: #62e0ac;
+          color: var(--tf-accent-hover);
         }
 
         .stat-label {

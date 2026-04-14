@@ -17,7 +17,7 @@
       </a-modal>
       <div class="logoBox">
         <img :src="logo" alt="logo" class="logo-img" />
-        <span class="logo-text">Toonflow</span>
+        <span class="logo-text">Metis</span>
       </div>
       <div class="heroCopy">
         <h1>深色 AI 创作工作台</h1>

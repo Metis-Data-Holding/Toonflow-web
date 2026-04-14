@@ -1,6 +1,6 @@
 <template>
   <div class="officialConfig">
-    <t-input v-model="apiKey" placeholder="请输入Toonflow官方apiKey" />
+    <t-input v-model="apiKey" placeholder="请输入Metis官方apiKey" />
     
   </div>
 </template>

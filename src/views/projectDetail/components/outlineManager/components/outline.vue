@@ -485,7 +485,7 @@ defineExpose({ getData });
   max-width: 100%;
   margin: 0 auto;
   padding: 20px;
-  background: var(--td-bg-color-page);
+  background: transparent;
   min-height: 100%;
 }
 
@@ -496,29 +496,28 @@ defineExpose({ getData });
   align-items: center;
   margin-bottom: 20px;
   padding: 24px;
-  background: var(--mainGradient);
+  background: linear-gradient(180deg, rgba(124, 132, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid var(--tf-border-strong);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(152, 16, 250, 0.25);
+  box-shadow: var(--tf-shadow-1);
 
   .header-content {
     .page-title {
-      font-size: 22px;
-      font-weight: 700;
+      font: var(--tf-font-section-title);
       margin: 0 0 6px;
-      color: #fff;
+      color: var(--tf-text-primary);
     }
     .page-desc {
       margin: 0;
-      opacity: 0.9;
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.9);
+      font: var(--tf-font-caption);
+      color: var(--tf-text-secondary);
     }
   }
 
   .add-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    color: #fff;
+    background: var(--tf-accent);
+    border: 1px solid transparent;
+    color: var(--tf-text-primary);
     height: 40px;
     padding: 0 20px;
     display: flex;
@@ -528,8 +527,7 @@ defineExpose({ getData });
     transition: all 0.3s;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.35);
-      border-color: #fff;
+      background: var(--tf-accent-hover);
       transform: translateY(-1px);
     }
   }
@@ -543,16 +541,16 @@ defineExpose({ getData });
 }
 
 .outline-card {
-  background: var(--td-bg-color-container);
+  background: var(--tf-bg-panel);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: var(--td-shadow-1);
-  border: 1px solid var(--td-component-stroke);
+  box-shadow: var(--tf-shadow-1);
+  border: 1px solid var(--tf-border-subtle);
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: var(--td-shadow-2);
-    border-color: var(--td-brand-color-light-hover);
+    box-shadow: var(--tf-shadow-2);
+    border-color: rgba(124, 132, 255, 0.22);
     transform: translateY(-2px);
   }
 
@@ -560,25 +558,25 @@ defineExpose({ getData });
     display: flex;
     align-items: center;
     padding: 16px 20px;
-    background: var(--td-brand-color-light);
-    border-bottom: 1px solid var(--td-brand-color-light-hover);
+    background: linear-gradient(180deg, rgba(124, 132, 255, 0.12) 0%, rgba(124, 132, 255, 0.04) 100%);
+    border-bottom: 1px solid var(--tf-border-strong);
 
     .episode-badge {
-      background: var(--mainGradient);
-      color: #fff;
+      background: var(--tf-accent);
+      color: var(--tf-text-primary);
       padding: 6px 14px;
       border-radius: 20px;
       font-size: 13px;
       font-weight: 600;
       margin-right: 14px;
-      box-shadow: 0 2px 8px rgba(152, 16, 250, 0.3);
+      box-shadow: 0 10px 18px rgba(124, 132, 255, 0.24);
     }
 
     .card-title {
       flex: 1;
       font-size: 16px;
       font-weight: 600;
-      color: var(--td-text-color-primary);
+      color: var(--tf-text-primary);
     }
 
     .card-actions {
@@ -596,13 +594,13 @@ defineExpose({ getData });
         transition: all 0.2s;
 
         &:hover {
-          background: var(--td-brand-color-light);
-          color: var(--td-brand-color);
+          background: rgba(124, 132, 255, 0.14);
+          color: var(--tf-accent-hover);
         }
 
         &.danger:hover {
-          background: var(--td-error-color-light);
-          color: var(--td-error-color);
+          background: rgba(239, 68, 68, 0.14);
+          color: var(--tf-danger);
         }
       }
     }
@@ -618,18 +616,19 @@ defineExpose({ getData });
   display: flex;
   align-items: center;
   padding: 10px 14px;
-  background: var(--td-bg-color-secondarycontainer);
+  background: var(--tf-bg-panel-2);
   border-radius: 10px;
   font-size: 13px;
   transition: all 0.2s;
+  border: 1px solid var(--tf-border-subtle);
 
   &:hover {
-    background: var(--td-bg-color-secondarycontainer-hover);
+    background: var(--tf-bg-float);
   }
 
   &.highlight {
-    background: var(--td-brand-color-light);
-    border: 1px solid var(--td-brand-color-light-hover);
+    background: rgba(124, 132, 255, 0.12);
+    border: 1px solid rgba(124, 132, 255, 0.22);
   }
 
   .field-icon {
@@ -638,14 +637,14 @@ defineExpose({ getData });
   }
 
   .field-label {
-    color: var(--td-text-color-secondary);
+    color: var(--tf-text-secondary);
     min-width: 65px;
     flex-shrink: 0;
     font-weight: 500;
   }
 
   .field-value {
-    color: var(--td-text-color-primary);
+    color: var(--tf-text-primary);
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -664,7 +663,7 @@ defineExpose({ getData });
 
     .field-content {
       margin: 0;
-      color: var(--td-text-color-secondary);
+      color: var(--tf-text-secondary);
       line-height: 1.7;
       display: -webkit-box;
       -webkit-line-clamp: 3;
@@ -678,7 +677,7 @@ defineExpose({ getData });
 .tags-section {
   margin-top: 14px;
   padding-top: 14px;
-  border-top: 1px dashed var(--td-component-stroke);
+  border-top: 1px dashed var(--tf-border-subtle);
 
   .tag-group {
     display: flex;
@@ -691,7 +690,7 @@ defineExpose({ getData });
 
     .tag-label {
       font-size: 12px;
-      color: var(--td-text-color-secondary);
+      color: var(--tf-text-secondary);
       min-width: 65px;
       font-weight: 500;
     }
@@ -713,31 +712,31 @@ defineExpose({ getData });
   font-weight: 500;
 
   &.blue {
-    background: var(--td-brand-color-light);
-    color: var(--td-brand-color);
-    border: 1px solid var(--td-brand-color-light-hover);
+    background: rgba(124, 132, 255, 0.14);
+    color: #d9ddff;
+    border: 1px solid rgba(124, 132, 255, 0.2);
   }
 
   &.purple {
-    background: var(--td-brand-color-light);
-    color: var(--td-brand-color);
-    border: 1px solid var(--td-brand-color-light-hover);
+    background: rgba(124, 132, 255, 0.14);
+    color: #d9ddff;
+    border: 1px solid rgba(124, 132, 255, 0.2);
   }
 
   &.more {
-    background: var(--td-bg-color-secondarycontainer);
-    color: var(--td-text-color-placeholder);
-    border: 1px solid var(--td-component-stroke);
+    background: var(--tf-bg-panel-2);
+    color: var(--tf-text-muted);
+    border: 1px solid var(--tf-border-subtle);
   }
 }
 
 // 空状态
 .empty-state {
   padding: 80px 20px;
-  background: var(--td-bg-color-container);
+  background: var(--tf-bg-panel);
   border-radius: 16px;
   text-align: center;
-  border: 2px dashed var(--td-component-stroke);
+  border: 2px dashed var(--tf-border-subtle);
 
   .empty-icon {
     font-size: 48px;
@@ -745,20 +744,20 @@ defineExpose({ getData });
   }
 
   .empty-text {
-    color: var(--td-text-color-placeholder);
+    color: var(--tf-text-muted);
     font-size: 15px;
     margin-bottom: 20px;
   }
 
   .empty-btn {
-    background: var(--mainGradient);
-    border: none;
+    background: var(--tf-accent);
+    border: 1px solid transparent;
     height: 40px;
     padding: 0 24px;
     font-weight: 500;
 
     &:hover {
-      background: var(--mainGradientHover);
+      background: var(--tf-accent-hover);
     }
   }
 }
@@ -774,9 +773,9 @@ defineExpose({ getData });
 .form-section {
   margin-bottom: 20px;
   padding: 20px;
-  background: var(--td-bg-color-secondarycontainer);
+  background: var(--tf-bg-panel-2);
   border-radius: 12px;
-  border: 1px solid var(--td-component-stroke);
+  border: 1px solid var(--tf-border-subtle);
 
   &:last-child {
     margin-bottom: 0;
@@ -786,6 +785,7 @@ defineExpose({ getData });
     font-size: 15px;
     font-weight: 600;
     color: var(--td-text-color-primary);
+    color: var(--tf-text-primary);
     margin-bottom: 18px;
     display: flex;
     align-items: center;
@@ -799,7 +799,7 @@ defineExpose({ getData });
       content: "";
       flex: 1;
       height: 1px;
-      background: linear-gradient(90deg, var(--td-component-stroke) 0%, transparent 100%);
+      background: linear-gradient(90deg, var(--tf-border-strong) 0%, transparent 100%);
       margin-left: 12px;
     }
   }
@@ -811,19 +811,19 @@ defineExpose({ getData });
   gap: 14px;
 
   .select-btn {
-    border-color: var(--td-brand-color);
-    color: var(--td-brand-color);
+    border-color: rgba(124, 132, 255, 0.24);
+    color: var(--tf-accent-hover);
     display: flex;
     align-items: center;
     gap: 4px;
 
     &:hover {
-      background: var(--td-brand-color-light);
+      background: rgba(124, 132, 255, 0.1);
     }
   }
 
   .selected-text {
-    color: var(--td-text-color-secondary);
+    color: var(--tf-text-secondary);
     font-size: 13px;
   }
 }
@@ -831,13 +831,13 @@ defineExpose({ getData });
 .asset-box {
   min-height: 80px;
   padding: 12px;
-  background: var(--td-bg-color-container);
-  border: 1px dashed var(--td-component-border);
+  background: var(--tf-bg-panel);
+  border: 1px dashed var(--tf-border-strong);
   border-radius: 10px;
   transition: all 0.2s;
 
   &:hover {
-    border-color: var(--td-brand-color);
+    border-color: rgba(124, 132, 255, 0.28);
   }
 
   .asset-tags {
@@ -852,8 +852,8 @@ defineExpose({ getData });
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    background: var(--td-brand-color-light);
-    color: var(--td-brand-color);
+    background: rgba(124, 132, 255, 0.12);
+    color: #d9ddff;
     border-radius: 6px;
     font-size: 12px;
     font-weight: 500;
@@ -870,12 +870,12 @@ defineExpose({ getData });
   }
 
   .add-asset-btn {
-    border-color: var(--td-component-border);
-    color: var(--td-text-color-secondary);
+    border-color: var(--tf-border-strong);
+    color: var(--tf-text-secondary);
 
     &:hover {
-      border-color: var(--td-brand-color);
-      color: var(--td-brand-color);
+      border-color: rgba(124, 132, 255, 0.28);
+      color: var(--tf-accent-hover);
     }
   }
 }

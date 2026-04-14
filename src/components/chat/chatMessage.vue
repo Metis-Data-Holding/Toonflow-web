@@ -22,7 +22,7 @@
       </template>
       <template v-else>
         <div v-for="(item, index) in msg.data" :key="index">
-          <McBubble v-if="item.type === 'text'" :align="'right'">
+          <McBubble v-if="item.type === 'text'" :align="'right'" :variant="'bordered'">
             <McMarkdownCard :enableThink="true" :content="item.text" :theme="theme"></McMarkdownCard>
           </McBubble>
           <McBubble v-if="item.type === 'image_url'" :content="item.image_url" :align="'right'"></McBubble>
